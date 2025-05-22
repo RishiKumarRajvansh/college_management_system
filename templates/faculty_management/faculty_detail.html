@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Details | {{ faculty.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'faculty_list' %}">Faculty</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ faculty.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Faculty Details</h2>
+                <div>
+                    {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'faculty_update' faculty.faculty_id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'faculty_delete' faculty.faculty_id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name={{ faculty.name|urlencode }}&size=128&background=random" class="rounded-circle img-thumbnail" alt="{{ faculty.name }}">
+                        <h4 class="mt-2">{{ faculty.name }}</h4>
+                        <p class="text-muted">Faculty ID: {{ faculty.faculty_id }}</p>
+                        <span class="badge bg-primary">{{ faculty.department }}</span>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <strong>Email:</strong> {{ faculty.email }}
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col">
+                            <small>Joined: {{ faculty.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="col text-end">
+                            <small>Updated: {{ faculty.updated_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong><i class="fas fa-phone"></i> Phone:</strong> Not provided
+                    </div>
+                    <div class="mb-2">
+                        <strong><i class="fas fa-building"></i> Office:</strong> Not provided
+                    </div>
+                    <div class="mb-2">
+                        <strong><i class="fas fa-clock"></i> Office Hours:</strong> Not provided
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Contact information can be updated in profile settings</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Courses Taught -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Courses Taught</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Schedule</th>
+                                    <th>Students</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.course_id }}</td>
+                                    <td>{{ course.course_name }}</td>
+                                    <td>{{ course.schedule|default:"Not scheduled" }}</td>
+                                    <td>{{ course.student_set.count }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No courses assigned to this faculty member.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {% if user.is_staff or user.is_superuser %}
+                    <a href="#" class="btn btn-outline-primary">Assign New Course</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Department Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Department Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="h2">{{ faculty.department }}</div>
+                            <div class="text-muted">Department</div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="h2">{{ courses|length|default:"0" }}</div>
+                            <div class="text-muted">Courses</div>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="h2">-</div>
+                            <div class="text-muted">Experience (Years)</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <p><strong>Department Description:</strong> Information about the {{ faculty.department }} department will be displayed here.</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Today</div>
+                            <div class="timeline-content">
+                                <p>Marked attendance for Database Management Systems</p>
+                                <span class="badge bg-info">Attendance</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Yesterday</div>
+                            <div class="timeline-content">
+                                <p>Submitted grades for Software Engineering midterm</p>
+                                <span class="badge bg-success">Grades</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">3 days ago</div>
+                            <div class="timeline-content">
+                                <p>Updated course materials for Computer Networks</p>
+                                <span class="badge bg-primary">Course Update</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    height: 100%;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+.timeline-item:last-child:before {
+    height: 50%;
+}
+
+.timeline-date {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.timeline-content {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.timeline-item:after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #007bff;
+}
+</style>
+{% endblock %}

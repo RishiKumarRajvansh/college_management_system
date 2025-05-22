@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'result_list' %}">Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>{{ title }} - Individual Entry</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
+                        {{ form.student }}
+                        {% if form.student.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.student.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.examination.id_for_label }}" class="form-label">Examination</label>
+                        {{ form.examination }}
+                        {% if form.examination.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.examination.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.marks_obtained.id_for_label }}" class="form-label">Marks Obtained</label>
+                        {{ form.marks_obtained }}
+                        {% if form.marks_obtained.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.marks_obtained.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if examination %}
+                        <small class="text-muted">Total marks for this exam: {{ examination.total_marks }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks (Optional)</label>
+                        {{ form.remarks }}
+                        {% if form.remarks.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.remarks.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% if examination %}{% url 'examination_detail' examination.exam_id %}{% else %}{% url 'result_list' %}{% endif %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Result
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if examination %}
+    <div class="card">
+        <div class="card-header">
+            <h4>{{ title }} - Bulk Entry</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="bulk_entry" value="1">
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Examination</label>
+                        <input type="text" class="form-control" value="{{ examination.exam_name }}" readonly>
+                        <input type="hidden" name="examination" value="{{ examination.exam_id }}">
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Marks Obtained</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in examination.course.student_set.all %}
+                            <tr>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>
+                                    <input type="number" name="marks_{{ student.student_id }}" class="form-control" min="0" max="{{ examination.total_marks }}" step="0.01">
+                                </td>
+                                <td>
+                                    <textarea name="remarks_{{ student.student_id }}" class="form-control" rows="1"></textarea>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No students found for this course.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'examination_detail' examination.exam_id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save All Results
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+/* Custom CSS for College Management System */
+
+/* Global styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Dashboard cards */
+.card-stats {
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card-stats:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-stats .card-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+/* Primary card */
+.card-stats-primary {
+    background: linear-gradient(135deg, #3a8ffe 0%, #004cff 100%);
+    color: white;
+}
+
+/* Success card */
+.card-stats-success {
+    background: linear-gradient(135deg, #21c44c 0%, #1db954 100%);
+    color: white;
+}
+
+/* Warning card */
+.card-stats-warning {
+    background: linear-gradient(135deg, #ffb75e 0%, #ed8f03 100%);
+    color: white;
+}
+
+/* Danger card */
+.card-stats-danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+    color: white;
+}
+
+/* Info card */
+.card-stats-info {
+    background: linear-gradient(135deg, #0acffe 0%, #0099ff 100%);
+    color: white;
+}
+
+/* Table styling */
+.table-custom {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.table-custom thead {
+    background-color: #4b6fff;
+    color: white;
+}
+
+/* Form styling */
+.form-card {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: none;
+}
+
+.form-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Buttons */
+.btn-custom {
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+/* Sidebar */
+.sidebar {
+    min-height: calc(100vh - 60px);
+    background-color: #2c3e50;
+    color: white;
+}
+
+.sidebar .nav-link {
+    color: #ecf0f1;
+    border-radius: 5px;
+    margin: 5px 10px;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+    background-color: #3498db;
+}
+
+/* Profile page */
+.profile-header {
+    background-color: #4b6fff;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Login page */
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+}
+
+.login-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.login-header {
+    background-color: #4b6fff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Dashboard charts */
+.chart-container {
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+/* Badge styling */
+.badge-custom {
+    padding: 6px 10px;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .profile-header {
+        text-align: center;
+    }
+    
+    .profile-image {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+}

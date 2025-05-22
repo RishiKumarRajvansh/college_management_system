@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Category: {{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-tag text-primary me-2"></i>
+            Fee Category: {{ category.name }}
+        </h1>
+        <div>
+            <a href="{% url 'fee_category_update' category.fee_category_id %}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'fee_category_delete' category.fee_category_id %}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+            <a href="{% url 'fee_category_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Category Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 30%">Category Name</th>
+                                <td>{{ category.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td>{{ category.description|default:"No description provided" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Created</th>
+                                <td>{{ category.created_at|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated</th>
+                                <td>{{ category.updated_at|date:"F d, Y H:i" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Fee Structures</h6>
+                    <a href="{% url 'fee_structure_create' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Add Fee Structure
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Academic Year</th>
+                                    <th>Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if fee_structures %}
+                                    {% for structure in fee_structures %}
+                                    <tr>
+                                        <td>{{ structure.course.course_name }}</td>
+                                        <td>{{ structure.academic_year }}</td>
+                                        <td>${{ structure.amount|floatformat:2 }}</td>
+                                        <td>{{ structure.due_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'fee_structure_detail' structure.fee_structure_id %}" class="btn btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'fee_structure_update' structure.fee_structure_id %}" class="btn btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No fee structures found for this category.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Management | Attendance Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Attendance Record Details</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'attendance_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Attendance List
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Attendance Information</h5>
+            {% if user.is_staff or user.is_superuser %}
+            <div>
+                <a href="{% url 'attendance_update' attendance.attendance_id %}" class="btn btn-sm btn-warning me-2">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'attendance_delete' attendance.attendance_id %}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Attendance ID:</div>
+                <div class="col-md-8">{{ attendance.attendance_id }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Student:</div>
+                <div class="col-md-8">
+                    <a href="{% url 'student_detail' attendance.student.student_id %}">{{ attendance.student.name }}</a>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Course:</div>
+                <div class="col-md-8">
+                    <a href="{% url 'course_detail' attendance.course.course_id %}">{{ attendance.course.course_name }}</a>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Date:</div>
+                <div class="col-md-8">{{ attendance.date|date:"F d, Y" }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Status:</div>
+                <div class="col-md-8">
+                    {% if attendance.status == 'present' %}
+                    <span class="badge bg-success">Present</span>
+                    {% elif attendance.status == 'absent' %}
+                    <span class="badge bg-danger">Absent</span>
+                    {% elif attendance.status == 'late' %}
+                    <span class="badge bg-warning">Late</span>
+                    {% elif attendance.status == 'excused' %}
+                    <span class="badge bg-info">Excused</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Created At:</div>
+                <div class="col-md-8">{{ attendance.created_at }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 fw-bold">Last Updated:</div>
+                <div class="col-md-8">{{ attendance.updated_at }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Student Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Student Name:</div>
+                        <div class="col-md-8">{{ attendance.student.name }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Email:</div>
+                        <div class="col-md-8">{{ attendance.student.email }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Year:</div>
+                        <div class="col-md-8">{{ attendance.student.year }}</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'student_attendance' attendance.student.student_id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-check"></i> View All Attendance Records
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Course Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Course Name:</div>
+                        <div class="col-md-8">{{ attendance.course.course_name }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Faculty:</div>
+                        <div class="col-md-8">{{ attendance.course.faculty.name }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Credits:</div>
+                        <div class="col-md-8">{{ attendance.course.credits }}</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'course_detail' attendance.course.course_id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-info-circle"></i> View Course Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

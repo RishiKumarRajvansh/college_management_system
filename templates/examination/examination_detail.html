@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Examination Details | {{ examination.exam_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'examination_list' %}">Examinations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ examination.exam_name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Examination Details</h2>
+                <div>
+                    {% if user.is_staff or user.is_superuser or user.faculty_profile %}
+                    <a href="{% url 'examination_update' examination.exam_id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'examination_delete' examination.exam_id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Examination Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4 mb-2">
+                            {% if examination.exam_type == 'midterm' %}
+                                <i class="fas fa-clipboard-list text-warning"></i>
+                            {% elif examination.exam_type == 'final' %}
+                                <i class="fas fa-graduation-cap text-primary"></i>
+                            {% elif examination.exam_type == 'quiz' %}
+                                <i class="fas fa-question-circle text-info"></i>
+                            {% elif examination.exam_type == 'assignment' %}
+                                <i class="fas fa-tasks text-success"></i>
+                            {% elif examination.exam_type == 'project' %}
+                                <i class="fas fa-project-diagram text-danger"></i>
+                            {% else %}
+                                <i class="fas fa-file-alt text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <h4>{{ examination.exam_name }}</h4>
+                        <p class="text-muted">Exam ID: {{ examination.exam_id }}</p>
+                        <span class="badge bg-primary">{{ examination.get_exam_type_display }}</span>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <strong>Course:</strong> {{ examination.course.course_name }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Date:</strong> {{ examination.date|date:"F d, Y" }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Time:</strong> {{ examination.date|date:"h:i A" }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Duration:</strong> {{ examination.duration }} minutes
+                    </div>
+                    <div class="mb-2">
+                        <strong>Total Marks:</strong> {{ examination.total_marks }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Passing Marks:</strong> {{ examination.passing_marks }}
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col">
+                            <small>Created: {{ examination.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="col text-end">
+                            <small>Updated: {{ examination.updated_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.is_staff or user.is_superuser or user.faculty_profile %}
+                        <a href="{% url 'result_create_for_exam' examination.exam_id %}" class="btn btn-primary">
+                            <i class="fas fa-clipboard-check"></i> Enter Results
+                        </a>
+                        <a href="#" class="btn btn-info">
+                            <i class="fas fa-print"></i> Print Question Paper
+                        </a>
+                        <a href="#" class="btn btn-secondary">
+                            <i class="fas fa-file-export"></i> Export Results
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Results Statistics Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Results Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6">{{ total_students }}</div>
+                            <div class="text-muted">Total Students</div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-success">{{ passed_count }}</div>
+                            <div class="text-muted">Passed</div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-danger">{{ failed_count }}</div>
+                            <div class="text-muted">Failed</div>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="display-6 text-warning">{{ absent_count }}</div>
+                            <div class="text-muted">Absent</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Pass Percentage</h6>
+                            <div class="progress mb-2" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ pass_percentage }}%;" aria-valuenow="{{ pass_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ pass_percentage|floatformat:1 }}%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Average Marks</h6>
+                            <div class="progress mb-2" style="height: 25px;">
+                                {% with avg_percentage=avg_marks|floatformat:1 %}
+                                <div class="progress-bar 
+                                    {% if avg_percentage >= 80 %}bg-success
+                                    {% elif avg_percentage >= 60 %}bg-primary
+                                    {% elif avg_percentage >= 40 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ avg_percentage }}%;" 
+                                    aria-valuenow="{{ avg_percentage }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">{{ avg_percentage }}%</div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="mb-3">Grade Distribution</h6>
+                    <div class="row">
+                        {% for grade, count in grade_distribution.items %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body p-2">
+                                    <h5 class="mb-0">{{ grade }}</h5>
+                                    <div class="text-muted">{{ count }} student{{ count|pluralize }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5>Student Results</h5>
+                    <span>Total: {{ results.count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student Name</th>
+                                    <th>Marks</th>
+                                    <th>Percentage</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.student.student_id }}</td>
+                                    <td>{{ result.student.name }}</td>
+                                    <td>{{ result.marks_obtained }} / {{ examination.total_marks }}</td>
+                                    <td>{{ result.percentage|floatformat:2 }}%</td>
+                                    <td>
+                                        {% if result.grade == 'A+' %}<span class="badge bg-success">A+</span>
+                                        {% elif result.grade == 'A' %}<span class="badge bg-success">A</span>
+                                        {% elif result.grade == 'B+' %}<span class="badge bg-primary">B+</span>
+                                        {% elif result.grade == 'B' %}<span class="badge bg-primary">B</span>
+                                        {% elif result.grade == 'C+' %}<span class="badge bg-info">C+</span>
+                                        {% elif result.grade == 'C' %}<span class="badge bg-info">C</span>
+                                        {% elif result.grade == 'D' %}<span class="badge bg-warning">D</span>
+                                        {% elif result.grade == 'F' %}<span class="badge bg-danger">F</span>
+                                        {% else %}<span class="badge bg-secondary">-</span>{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.status == 'pass' %}<span class="badge bg-success">Pass</span>
+                                        {% elif result.status == 'fail' %}<span class="badge bg-danger">Fail</span>
+                                        {% elif result.status == 'absent' %}<span class="badge bg-warning">Absent</span>
+                                        {% else %}<span class="badge bg-secondary">Incomplete</span>{% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'result_detail' result.result_id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if user.is_staff or user.is_superuser or user.faculty_profile %}
+                                        <a href="{% url 'result_update' result.result_id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'result_delete' result.result_id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-clipboard fa-3x text-muted mb-3"></i>
+                        <h5>No results have been entered yet</h5>
+                        {% if user.is_staff or user.is_superuser or user.faculty_profile %}
+                        <p class="text-muted">Click the button below to start entering results</p>
+                        <a href="{% url 'result_create_for_exam' examination.exam_id %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Enter Results
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

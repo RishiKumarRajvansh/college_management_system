@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Management | {{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>{{ title }}</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'attendance_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Attendance List
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
+                        {{ form.course }}
+                        {% if form.course.errors %}
+                        <div class="text-danger">
+                            {% for error in form.course.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                        <div class="text-danger">
+                            {% for error in form.date.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if not form.course.value %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Get Students</button>
+                </div>
+                {% else %}
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Student Attendance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for field_name, field in form.fields.items %}
+                                        {% if field_name != 'course' and field_name != 'date' %}
+                                            <tr>
+                                                <td>{{ field.label }}</td>
+                                                <td>
+                                                    {{ form|getattribute:field_name }}
+                                                    {% if form|getattributeerrors:field_name %}
+                                                    <div class="text-danger">
+                                                        {{ form|getattributeerrors:field_name }}
+                                                    </div>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'bulk_attendance' %}" class="btn btn-secondary me-md-2">Reset</a>
+                    <button type="submit" class="btn btn-success">Save All Attendance</button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Add custom templatetags that might not be defined
+    if (typeof getattribute === "undefined") {
+        function getattribute(form, field_name) {
+            return form[field_name];
+        }
+    }
+    if (typeof getattributeerrors === "undefined") {
+        function getattributeerrors(form, field_name) {
+            return form[field_name + '_errors'];
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

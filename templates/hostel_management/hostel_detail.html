@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hostel.hostel_name }} Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-building text-primary me-2"></i> {{ hostel.hostel_name }}</h1>
+        <div class="btn-group" role="group">
+            <a href="{% url 'hostel_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Hostels
+            </a>
+            <a href="{% url 'hostel_update' hostel.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'hostel_delete' hostel.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+    
+    <!-- Hostel Details -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hostel Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <th class="w-25">ID</th>
+                                <td>{{ hostel.hostel_id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ hostel.hostel_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Warden</th>
+                                <td>{{ hostel.warden_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Contact</th>
+                                <td>{{ hostel.contact_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Rooms</th>
+                                <td>{{ hostel.total_rooms }}</td>
+                            </tr>
+                            <tr>
+                                <th>Created On</th>
+                                <td>{{ hostel.created_at }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated</th>
+                                <td>{{ hostel.updated_at }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Room Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3 col-6 mb-3">
+                                        <div class="h5 mb-0 font-weight-bold">{{ total_rooms }}</div>
+                                        <div class="small text-gray-500">Total Rooms</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-3">
+                                        <div class="h5 mb-0 font-weight-bold text-success">{{ available_rooms }}</div>
+                                        <div class="small text-gray-500">Available</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-3">
+                                        <div class="h5 mb-0 font-weight-bold text-info">{{ occupied_rooms }}</div>
+                                        <div class="small text-gray-500">Occupied</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-3">
+                                        <div class="h5 mb-0 font-weight-bold text-warning">{{ maintenance_rooms }}</div>
+                                        <div class="small text-gray-500">Maintenance</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="{% url 'room_create' %}" class="btn btn-primary mb-3">
+                            <i class="fas fa-plus-circle me-2"></i>Add New Room
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hostel Rooms -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Rooms in {{ hostel.hostel_name }}</h6>
+        </div>
+        <div class="card-body">
+            {% if rooms %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for room in rooms %}
+                                <tr>
+                                    <td>{{ room.room_number }}</td>
+                                    <td>{{ room.capacity }}</td>
+                                    <td>
+                                        {% if room.status == 'available' %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% elif room.status == 'occupied' %}
+                                            <span class="badge bg-info">Occupied</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'room_detail' room.pk %}" class="btn btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'room_update' room.pk %}" class="btn btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'room_delete' room.pk %}" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <p>No rooms found for this hostel.</p>
+                    <a href="{% url 'room_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Room
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

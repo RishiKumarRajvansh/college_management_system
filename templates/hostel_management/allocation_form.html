@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Update Allocation{% else %}Allocate Room{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-bed text-primary me-2"></i>
+            {% if form.instance.pk %}Update Room Allocation{% else %}Allocate Room{% endif %}
+        </h1>
+        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Allocations
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        {% if form.instance.pk %}
+                        Update Allocation Details
+                        {% else %}
+                        Allocation Information
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
+                                {{ form.student }}
+                                {% if form.student.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.student.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Select the student to allocate a room to</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.room.id_for_label }}" class="form-label">Available Rooms</label>
+                                {{ form.room }}
+                                {% if form.room.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.room.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Only available rooms are shown</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date (Optional)</label>
+                                {{ form.end_date }}
+                                {% if form.end_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.end_date.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Expected end date of stay (leave blank if uncertain)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        Active Allocation
+                                    </label>
+                                    {% if form.is_active.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.is_active.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Uncheck to mark allocation as inactive</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {% if form.instance.pk %}
+                                Update Allocation
+                                {% else %}
+                                Allocate Room
+                                {% endif %}
+                            </button>
+                            <a href="{% url 'allocation_list' %}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Allocation Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <p>Please note the following guidelines for room allocation:</p>
+                    <ul>
+                        <li>A student can only be allocated to one room at a time</li>
+                        <li>Only available rooms are shown in the selection</li>
+                        <li>Once allocated, the room status will be changed to 'occupied'</li>
+                        <li>When a student vacates a room, the room status will be updated to 'available'</li>
+                        <li>End date is optional but recommended for planning purposes</li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Make sure to verify student information before allocation.
+                    </div>
+                </div>
+            </div>
+            
+            {% if form.instance.pk %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Vacate Room</h6>
+                </div>
+                <div class="card-body">
+                    <p>If the student is vacating the room, you can mark this allocation as inactive:</p>
+                    <div class="text-center">
+                        <a href="{% url 'vacate_room' form.instance.pk %}" class="btn btn-danger">
+                            <i class="fas fa-door-open me-2"></i>Vacate Room
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

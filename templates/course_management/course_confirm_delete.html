@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Course Management | Delete Course{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Delete Course</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'course_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Courses
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Warning!</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead">Are you sure you want to delete the course "{{ course.course_name }}"?</p>
+            <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+            
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-exclamation-triangle"></i> Important:</h6>
+                <ul class="mb-0">
+                    <li>Deleting this course will remove all associated data.</li>
+                    <li>Students enrolled in this course may be affected.</li>
+                    <li>Any exams, attendance records, and other related information will be deleted.</li>
+                </ul>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'course_detail' course.course_id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

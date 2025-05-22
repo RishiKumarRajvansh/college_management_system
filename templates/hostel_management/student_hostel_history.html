@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ student.name }}'s Hostel History{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-history text-primary me-2"></i>Student Hostel History
+        </h1>
+        <a href="{% url 'student_detail' student.student_id %}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-user fa-sm text-white-50 me-1"></i> Back to Student Profile
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Student Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="display-1 text-primary">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h5 class="font-weight-bold mt-3">{{ student.name }}</h5>
+                        <p class="text-muted">Student ID: {{ student.student_id }}</p>
+                    </div>
+                    <hr>
+                    <dl class="row">
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">{{ student.email }}</dd>
+                        
+                        <dt class="col-sm-4">Course:</dt>
+                        <dd class="col-sm-8">{{ student.course.course_name }}</dd>
+                        
+                        <dt class="col-sm-4">Year:</dt>
+                        <dd class="col-sm-8">{{ student.year }}</dd>
+                        
+                        <dt class="col-sm-4">Created:</dt>
+                        <dd class="col-sm-8">{{ student.created_at|date:"F d, Y" }}</dd>
+                    </dl>
+                    
+                    {% with current_allocation=allocations|first %}
+                    {% if current_allocation.is_active %}
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Currently staying in <strong>{{ current_allocation.room.hostel.hostel_name }}</strong>, 
+                        Room <strong>{{ current_allocation.room.room_number }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-secondary mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Not currently allocated to any hostel room.
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'allocation_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>New Allocation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Hostel Allocation History</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Export Options:</div>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-file-csv me-2"></i>CSV
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-file-pdf me-2"></i>PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if allocations %}
+                    <div class="timeline">
+                        {% for allocation in allocations %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker {% if allocation.is_active %}bg-success{% else %}bg-danger{% endif %}"></div>
+                            <div class="timeline-content">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="m-0 font-weight-bold">
+                                                {{ allocation.room.hostel.hostel_name }} - Room {{ allocation.room.room_number }}
+                                            </h6>
+                                            {% if allocation.is_active %}
+                                            <span class="badge bg-success">Current</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Allocation Date:</strong> {{ allocation.allocation_date|date:"F d, Y" }}</p>
+                                                <p><strong>End Date:</strong> 
+                                                    {% if allocation.end_date %}
+                                                    {{ allocation.end_date|date:"F d, Y" }}
+                                                    {% elif not allocation.is_active %}
+                                                    <span class="text-muted">Not recorded</span>
+                                                    {% else %}
+                                                    <span class="text-muted">Not set</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Duration:</strong>
+                                                    {% if allocation.end_date %}
+                                                    {{ allocation.allocation_date|timesince:allocation.end_date }}
+                                                    {% elif allocation.is_active %}
+                                                    {{ allocation.allocation_date|timesince }} (ongoing)
+                                                    {% else %}
+                                                    <span class="text-muted">Unknown</span>
+                                                    {% endif %}
+                                                </p>
+                                                <p><strong>Status:</strong>
+                                                    {% if allocation.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                    {% else %}
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <a href="{% url 'allocation_detail' allocation.allocation_id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </a>
+                                            {% if allocation.is_active %}
+                                            <a href="{% url 'vacate_room' allocation.allocation_id %}" class="btn btn-sm btn-warning ms-2">
+                                                <i class="fas fa-door-open me-1"></i> Vacate Room
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="display-1 text-muted mb-3">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <h5 class="text-muted">No hostel history found for this student</h5>
+                        <p>This student has not been allocated to any hostel room yet.</p>
+                        <a href="{% url 'allocation_create' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus-circle me-2"></i>Allocate Room
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        padding-left: 30px;
+    }
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px #f8f9fc;
+    }
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 15px;
+        height: 100%;
+        width: 1px;
+        background-color: #e3e6f0;
+    }
+    .timeline-item:last-child:before {
+        display: none;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-door-open text-primary me-2"></i> Rooms</h1>
+        <a href="{% url 'room_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Add New Room
+        </a>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h6 class="m-0 font-weight-bold">Search Rooms</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4 mb-2">
+                    {{ search_form.search_query }}
+                </div>
+                <div class="col-md-2 mb-2">
+                    {{ search_form.hostel }}
+                </div>
+                <div class="col-md-2 mb-2">
+                    {{ search_form.status }}
+                </div>
+                <div class="col-md-2 mb-2">
+                    {{ search_form.capacity }}
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Rooms List -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">All Rooms</h6>
+        </div>
+        <div class="card-body">
+            {% if rooms %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Hostel</th>
+                                <th>Room Number</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for room in rooms %}
+                                <tr>
+                                    <td>{{ room.room_id }}</td>
+                                    <td>{{ room.hostel.hostel_name }}</td>
+                                    <td>{{ room.room_number }}</td>
+                                    <td>{{ room.capacity }}</td>
+                                    <td>
+                                        {% if room.status == 'available' %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% elif room.status == 'occupied' %}
+                                            <span class="badge bg-info">Occupied</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'room_detail' room.pk %}" class="btn btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'room_update' room.pk %}" class="btn btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'room_delete' room.pk %}" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <nav aria-label="Pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">&laquo; First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="text-center py-4">
+                    <p>No rooms found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

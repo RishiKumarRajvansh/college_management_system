@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Result Details | {{ result.student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'result_list' %}">Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Result Details</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Result Details</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if user.is_staff or user.is_superuser or user.faculty_profile %}
+            <a href="{% url 'result_update' result.result_id %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'result_delete' result.result_id %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+            {% endif %}
+            <a href="javascript:window.print();" class="btn btn-info">
+                <i class="fas fa-print"></i> Print
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Examination Result</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5>Student Information</h5>
+                                <hr>
+                                <p><strong>Name:</strong> {{ result.student.name }}</p>
+                                <p><strong>ID:</strong> {{ result.student.student_id }}</p>
+                                <p><strong>Course:</strong> {{ result.student.course.course_name }}</p>
+                                <p><strong>Year:</strong> {{ result.student.year }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h5>Examination Information</h5>
+                                <hr>
+                                <p><strong>Exam Name:</strong> {{ result.examination.exam_name }}</p>
+                                <p><strong>Type:</strong> {{ result.examination.get_exam_type_display }}</p>
+                                <p><strong>Date:</strong> {{ result.examination.date|date:"F d, Y" }}</p>
+                                <p><strong>Course:</strong> {{ result.examination.course.course_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card mb-3">
+                                <div class="card-header {% if result.status == 'pass' %}bg-success{% elif result.status == 'fail' %}bg-danger{% elif result.status == 'absent' %}bg-warning{% else %}bg-secondary{% endif %} text-white">
+                                    <h5 class="mb-0">Result Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="border rounded p-3 h-100">
+                                                <h6>Marks Obtained</h6>
+                                                <div class="display-6">{{ result.marks_obtained }}</div>
+                                                <small class="text-muted">out of {{ result.examination.total_marks }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="border rounded p-3 h-100">
+                                                <h6>Percentage</h6>
+                                                <div class="display-6">{{ result.percentage|floatformat:2 }}%</div>
+                                                <small class="text-muted">Passing: {{ result.examination.passing_marks|floatformat:2 }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="border rounded p-3 h-100">
+                                                <h6>Grade</h6>
+                                                <div class="display-6">
+                                                    {% if result.grade == 'A+' %}<span class="text-success">A+</span>
+                                                    {% elif result.grade == 'A' %}<span class="text-success">A</span>
+                                                    {% elif result.grade == 'B+' %}<span class="text-primary">B+</span>
+                                                    {% elif result.grade == 'B' %}<span class="text-primary">B</span>
+                                                    {% elif result.grade == 'C+' %}<span class="text-info">C+</span>
+                                                    {% elif result.grade == 'C' %}<span class="text-info">C</span>
+                                                    {% elif result.grade == 'D' %}<span class="text-warning">D</span>
+                                                    {% elif result.grade == 'F' %}<span class="text-danger">F</span>
+                                                    {% else %}-{% endif %}
+                                                </div>
+                                                <small class="text-muted">&nbsp;</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="border rounded p-3 h-100">
+                                                <h6>Status</h6>
+                                                <div class="display-6">
+                                                    {% if result.status == 'pass' %}<span class="text-success">PASS</span>
+                                                    {% elif result.status == 'fail' %}<span class="text-danger">FAIL</span>
+                                                    {% elif result.status == 'absent' %}<span class="text-warning">ABSENT</span>
+                                                    {% else %}<span class="text-secondary">INCOMPLETE</span>{% endif %}
+                                                </div>
+                                                <small class="text-muted">&nbsp;</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if result.remarks %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Remarks</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-0">{{ result.remarks|linebreaksbr }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Result ID: {{ result.result_id }}</small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted">Last Updated: {{ result.updated_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a href="{% url 'result_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Results
+                            </a>
+                            <a href="{% url 'student_results' result.student.student_id %}" class="btn btn-info">
+                                <i class="fas fa-user-graduate"></i> View All Results for {{ result.student.name }}
+                            </a>
+                        </div>
+                        <div>
+                            <a href="{% url 'examination_detail' result.examination.exam_id %}" class="btn btn-primary">
+                                <i class="fas fa-list"></i> View All Results for {{ result.examination.exam_name }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style media="print">
+    @page {
+        size: A4;
+        margin: 2cm;
+    }
+    .breadcrumb, .btn, nav, footer {
+        display: none !important;
+    }
+    .card {
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+    }
+    .card-header {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    .card-header.bg-success, 
+    .card-header.bg-danger, 
+    .card-header.bg-warning, 
+    .card-header.bg-secondary {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    .text-success { color: #000 !important; }
+    .text-danger { color: #000 !important; }
+    .text-warning { color: #000 !important; }
+    .text-info { color: #000 !important; }
+    .text-primary { color: #000 !important; }
+</style>
+{% endblock %}

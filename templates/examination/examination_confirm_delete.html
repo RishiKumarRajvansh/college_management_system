@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Examination | {{ examination.exam_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'examination_list' %}">Examinations</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete {{ examination.exam_name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4>Confirm Deletion</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Warning:</strong> This action cannot be undone!
+            </div>
+            
+            <p>Are you sure you want to delete the examination <strong>{{ examination.exam_name }}</strong> (ID: {{ examination.exam_id }})?</p>
+            
+            {% if has_results %}
+            <div class="alert alert-danger">
+                <p><strong>This examination has recorded results!</strong></p>
+                <p>Deleting this examination will also delete all associated student results. This may affect student GPA calculations and academic records.</p>
+            </div>
+            {% endif %}
+            
+            <div class="alert alert-info">
+                <p><strong>The following data will be permanently deleted:</strong></p>
+                <ul>
+                    <li>Examination details and metadata</li>
+                    {% if has_results %}
+                    <li>All student results for this examination</li>
+                    <li>Grade records associated with this examination</li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'examination_detail' examination.exam_id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Examination
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

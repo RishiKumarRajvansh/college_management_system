@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if payment %}Update{% else %}Record{% endif %} Payment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .receipt-preview {
+        background-color: #f9f9f9;
+        border: 1px dashed #ccc;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .receipt-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .receipt-details {
+        margin-bottom: 20px;
+    }
+    .receipt-footer {
+        text-align: center;
+        font-size: 0.9em;
+        margin-top: 30px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-{% if payment %}edit{% else %}plus-circle{% endif %} me-2"></i>
+                        {% if payment %}Update{% else %}Record New{% endif %} Payment
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate id="paymentForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
+                                    {{ form.student }}
+                                    {% if form.student.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.student.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.fee_structure.id_for_label }}" class="form-label">Fee Structure</label>
+                                    {{ form.fee_structure }}
+                                    {% if form.fee_structure.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.fee_structure.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.amount.id_for_label }}" class="form-label">Amount ($)</label>
+                                    {{ form.amount }}
+                                    {% if form.amount.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.amount.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.payment_method.id_for_label }}" class="form-label">Payment Method</label>
+                                    {{ form.payment_method }}
+                                    {% if form.payment_method.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.payment_method.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.transaction_id.id_for_label }}" class="form-label">Transaction ID</label>
+                                    {{ form.transaction_id }}
+                                    {% if form.transaction_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.transaction_id.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">For check, online, or card payments</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.receipt_number.id_for_label }}" class="form-label">Receipt Number</label>
+                                    {{ form.receipt_number }}
+                                    {% if form.receipt_number.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.receipt_number.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                                    {{ form.remarks }}
+                                    {% if form.remarks.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.remarks.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Receipt Preview</h5>
+                                <div class="receipt-preview">
+                                    <div class="receipt-header">
+                                        <h4>COLLEGE MANAGEMENT SYSTEM</h4>
+                                        <p>123 Education Lane, Knowledge City</p>
+                                        <hr>
+                                        <h5>PAYMENT RECEIPT</h5>
+                                        <p id="receiptNumber">Receipt #: {{ form.receipt_number.value }}</p>
+                                    </div>
+                                    
+                                    <div class="receipt-details">
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Student Name:</div>
+                                            <div class="col-7" id="studentName">Select a student</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Fee Category:</div>
+                                            <div class="col-7" id="feeCategory">Select a fee structure</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Course:</div>
+                                            <div class="col-7" id="courseName">Select a fee structure</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Academic Year:</div>
+                                            <div class="col-7" id="academicYear">Select a fee structure</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Payment Method:</div>
+                                            <div class="col-7" id="paymentMethod">{{ form.payment_method.value }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Transaction ID:</div>
+                                            <div class="col-7" id="transactionId">{{ form.transaction_id.value|default:"-" }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-5 fw-bold">Status:</div>
+                                            <div class="col-7" id="paymentStatus">{{ form.status.value }}</div>
+                                        </div>
+                                        
+                                        <hr>
+                                        
+                                        <div class="row">
+                                            <div class="col-5 fw-bold fs-5">Amount Paid:</div>
+                                            <div class="col-7 fs-5" id="amountPaid">${{ form.amount.value|default:"0.00" }}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="receipt-footer">
+                                        <p>Thank you for your payment!</p>
+                                        <p>Date: {% now "F d, Y" %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'payment_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if payment %}Update{% else %}Record{% endif %} Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update receipt preview dynamically
+        const studentSelect = document.getElementById('{{ form.student.id_for_label }}');
+        const feeStructureSelect = document.getElementById('{{ form.fee_structure.id_for_label }}');
+        const amountInput = document.getElementById('{{ form.amount.id_for_label }}');
+        const paymentMethodSelect = document.getElementById('{{ form.payment_method.id_for_label }}');
+        const transactionIdInput = document.getElementById('{{ form.transaction_id.id_for_label }}');
+        const statusSelect = document.getElementById('{{ form.status.id_for_label }}');
+        
+        // Receipt preview elements
+        const studentNameElement = document.getElementById('studentName');
+        const feeCategoryElement = document.getElementById('feeCategory');
+        const courseNameElement = document.getElementById('courseName');
+        const academicYearElement = document.getElementById('academicYear');
+        const paymentMethodElement = document.getElementById('paymentMethod');
+        const transactionIdElement = document.getElementById('transactionId');
+        const paymentStatusElement = document.getElementById('paymentStatus');
+        const amountPaidElement = document.getElementById('amountPaid');
+        
+        // Update student name
+        if (studentSelect) {
+            studentSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                studentNameElement.textContent = selectedOption.text || 'Select a student';
+            });
+            // Initialize with current value
+            if (studentSelect.selectedIndex > 0) {
+                const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+                studentNameElement.textContent = selectedOption.text || 'Select a student';
+            }
+        }
+        
+        // Update fee structure details
+        if (feeStructureSelect) {
+            feeStructureSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption && selectedOption.text) {
+                    const optionText = selectedOption.text;
+                    
+                    // Extract information from option text (assuming format: "Category - Course - Year - $Amount")
+                    const parts = optionText.split(' - ');
+                    if (parts.length >= 4) {
+                        feeCategoryElement.textContent = parts[0] || 'N/A';
+                        courseNameElement.textContent = parts[1] || 'N/A';
+                        academicYearElement.textContent = parts[2] || 'N/A';
+                        
+                        // Set the amount input if it's a new payment
+                        if (!amountInput.value && parts[3]) {
+                            const amountStr = parts[3].replace('$', '').trim();
+                            amountInput.value = amountStr;
+                            amountPaidElement.textContent = '$' + amountStr;
+                        }
+                    } else {
+                        feeCategoryElement.textContent = 'Select a fee structure';
+                        courseNameElement.textContent = 'Select a fee structure';
+                        academicYearElement.textContent = 'Select a fee structure';
+                    }
+                }
+            });
+            // Initialize with current value
+            if (feeStructureSelect.selectedIndex > 0) {
+                const event = new Event('change');
+                feeStructureSelect.dispatchEvent(event);
+            }
+        }
+        
+        // Update amount
+        if (amountInput) {
+            amountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value) || 0;
+                amountPaidElement.textContent = '$' + value.toFixed(2);
+            });
+        }
+        
+        // Update payment method
+        if (paymentMethodSelect) {
+            paymentMethodSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                paymentMethodElement.textContent = selectedOption.text || 'Select a method';
+            });
+            // Initialize with current value
+            if (paymentMethodSelect.selectedIndex > 0) {
+                const selectedOption = paymentMethodSelect.options[paymentMethodSelect.selectedIndex];
+                paymentMethodElement.textContent = selectedOption.text || 'Select a method';
+            }
+        }
+        
+        // Update transaction ID
+        if (transactionIdInput) {
+            transactionIdInput.addEventListener('input', function() {
+                transactionIdElement.textContent = this.value || '-';
+            });
+        }
+        
+        // Update status
+        if (statusSelect) {
+            statusSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                paymentStatusElement.textContent = selectedOption.text || 'Select a status';
+            });
+            // Initialize with current value
+            if (statusSelect.selectedIndex > 0) {
+                const selectedOption = statusSelect.options[statusSelect.selectedIndex];
+                paymentStatusElement.textContent = selectedOption.text || 'Select a status';
+            }
+        }
+    });
+</script>
+{% endblock %}

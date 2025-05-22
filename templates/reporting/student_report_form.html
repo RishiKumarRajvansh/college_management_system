@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Student Report{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-user-graduate text-primary me-2"></i>Generate Student Report
+        </h1>
+        <div>
+            <a href="{% url 'generate_report_options' %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Report Options
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Student Report Parameters</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.report_title.id_for_label }}" class="form-label">Report Title</label>
+                            {{ form.report_title }}
+                            {% if form.report_title.errors %}
+                            <div class="text-danger">
+                                {% for error in form.report_title.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Enter a descriptive title for this report</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.report_description.id_for_label }}" class="form-label">Report Description (Optional)</label>
+                            {{ form.report_description }}
+                            {% if form.report_description.errors %}
+                            <div class="text-danger">
+                                {% for error in form.report_description.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Provide additional context or notes about this report</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
+                                {{ form.course }}
+                                {% if form.course.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.course.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Filter students by course</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.year.id_for_label }}" class="form-label">Year</label>
+                                {{ form.year }}
+                                {% if form.year.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.year.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Filter students by year</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.export_format.id_for_label }}" class="form-label">Export Format</label>
+                            {{ form.export_format }}
+                            {% if form.export_format.errors %}
+                            <div class="text-danger">
+                                {% for error in form.export_format.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Select the format for the generated report</div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-export me-2"></i>Generate Report
+                            </button>
+                            <a href="{% url 'generate_report_options' %}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Report Information</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Student Report</strong> provides detailed information about students enrolled in the institution. The report can be filtered by course and year to focus on specific student groups.</p>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> Leave filters empty to include all students in the report.
+                    </div>
+                    
+                    <h6 class="font-weight-bold mt-4">Report Includes:</h6>
+                    <ul>
+                        <li>Student basic details (ID, Name)</li>
+                        <li>Contact information</li>
+                        <li>Course enrollment details</li>
+                        <li>Academic year information</li>
+                    </ul>
+                    
+                    <h6 class="font-weight-bold mt-4">Available Formats:</h6>
+                    <ul>
+                        <li><i class="far fa-file-pdf text-danger me-2"></i> PDF - Best for printing</li>
+                        <li><i class="far fa-file-excel text-success me-2"></i> Excel - Best for data analysis</li>
+                        <li><i class="far fa-file-csv text-primary me-2"></i> CSV - Best for data import</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">
+        <i class="fas fa-money-bill-wave text-primary me-2"></i>
+        Fee Management Dashboard
+    </h1>
+    
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Fees Collected</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_fees_collected|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Pending Payments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_payments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Fee Categories</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ fee_categories }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Fee Structures</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ fee_structures }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-invoice-dollar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'fee_category_create' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus-circle me-2"></i> Add Fee Category
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'fee_structure_create' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-plus-circle me-2"></i> Add Fee Structure
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'payment_create' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-plus-circle me-2"></i> Record Payment
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'fee_structure_list' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-list me-2"></i> All Fee Structures
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'fee_category_list' %}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-list me-2"></i> All Categories
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'payment_list' %}" class="btn btn-dark btn-block">
+                                <i class="fas fa-list me-2"></i> All Payments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Payments</h6>
+                    <a href="{% url 'payment_list' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Receipt #</th>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_payments %}
+                                    {% for payment in recent_payments %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'payment_detail' payment.payment_id %}">
+                                                {{ payment.receipt_number }}
+                                            </a>
+                                        </td>
+                                        <td>{{ payment.student.user.get_full_name }}</td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if payment.status == 'completed' %}
+                                                <span class="badge bg-success">{{ payment.get_status_display }}</span>
+                                            {% elif payment.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">{{ payment.get_status_display }}</span>
+                                            {% elif payment.status == 'failed' %}
+                                                <span class="badge bg-danger">{{ payment.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="badge bg-info">{{ payment.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No payment records found.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

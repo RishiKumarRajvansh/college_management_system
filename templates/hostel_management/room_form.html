@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Update Room{% else %}Add Room{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-door-open text-primary me-2"></i>
+            {% if form.instance.pk %}Update Room{% else %}Add New Room{% endif %}
+        </h1>
+        <a href="{% url 'room_list' %}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Rooms
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        {% if form.instance.pk %}
+                        Update Room: {{ form.instance.room_number }}
+                        {% else %}
+                        Room Information
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.hostel.id_for_label }}" class="form-label">Hostel</label>
+                                {{ form.hostel }}
+                                {% if form.hostel.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.hostel.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Select the hostel this room belongs to</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.room_number.id_for_label }}" class="form-label">Room Number</label>
+                                {{ form.room_number }}
+                                {% if form.room_number.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.room_number.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Enter the room number or identifier</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.capacity.id_for_label }}" class="form-label">Room Capacity</label>
+                                {{ form.capacity }}
+                                {% if form.capacity.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.capacity.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Maximum number of students that can be accommodated</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">Room Status</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.status.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Current status of the room</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Room
+                            </button>
+                            <a href="{% url 'room_list' %}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Room Management Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <p>Here are some guidelines for managing rooms:</p>
+                    <ul>
+                        <li>Each room must be assigned to a hostel</li>
+                        <li>Room numbers should be unique within each hostel</li>
+                        <li>Room capacity determines how many students can be accommodated</li>
+                        <li>Room status indicates if it's available for allocation</li>
+                    </ul>
+                    <p>Status Types:</p>
+                    <ul>
+                        <li><span class="badge bg-success">Available</span> - Ready for allocation</li>
+                        <li><span class="badge bg-warning">Occupied</span> - Currently allocated</li>
+                        <li><span class="badge bg-danger">Under Maintenance</span> - Not available for allocation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

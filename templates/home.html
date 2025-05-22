@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - College Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_authenticated %}
+        <!-- Dashboard for authenticated users -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="profile-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" class="profile-image" alt="{{ user.username }}">
+                            {% else %}
+                                <img src="{% static 'images/default-profile.svg' %}" class="profile-image" alt="{{ user.username }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h1 class="display-5">Welcome, {{ user.first_name|default:user.username }}!</h1>
+                            <p class="lead">{{ user.profile.user_type|title }} Dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Stats Cards -->
+        <div class="row">
+            {% if user.profile.user_type == 'admin' or user.is_staff %}
+                <!-- Students Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-primary">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-user-graduate card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Students</h5>
+                                    <h2 class="display-4">{{ student_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total registered students</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'student_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-success">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-chalkboard-teacher card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Faculty</h5>
+                                    <h2 class="display-4">{{ faculty_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total faculty members</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'faculty_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-info">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-book-open card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Courses</h5>
+                                    <h2 class="display-4">{{ course_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total available courses</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'course_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Library Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-warning">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-book-reader card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Library</h5>
+                                    <h2 class="display-4">{{ book_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total books ({{ borrowed_books }} borrowed)</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'book_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hostel Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-danger">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-building card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Hostels</h5>
+                                    <h2 class="display-4">{{ hostel_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">{{ available_rooms }} rooms available</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'hostel_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fee Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-info">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-money-check-alt card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Fees</h5>
+                                    <h2 class="display-4">₹{{ total_fees_collected|floatformat:0 }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">{{ pending_payments }} pending payments</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'payment_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if user.profile.user_type == 'student' %}
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-warning">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-calendar-check card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Attendance</h5>
+                                    <h2 class="display-4">{{ attendance_percentage }}%</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Your overall attendance</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'attendance_list' %}" class="text-white">View Details <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-info">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-file-alt card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Exams</h5>
+                                    <h2 class="display-4">{{ upcoming_exams_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Upcoming examinations</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'examination_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-danger">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-money-bill card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Fees</h5>
+                                    <h2 class="display-4">${{ pending_fees }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Pending fee payments</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'payment_list' %}" class="text-white">View Details <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if user.profile.user_type == 'faculty' %}
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-primary">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-book-open card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">My Courses</h5>
+                                    <h2 class="display-4">{{ faculty_courses_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total courses you teach</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'course_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-success">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-calendar-check card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Attendance</h5>
+                                    <h2 class="display-4">{{ attendance_today_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Attendance entries today</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'attendance_create' %}" class="text-white">Take Attendance <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="card card-stats card-stats-warning">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-5">
+                                    <i class="fas fa-file-alt card-icon"></i>
+                                </div>
+                                <div class="col-7">
+                                    <h5 class="card-title">Exams</h5>
+                                    <h2 class="display-4">{{ faculty_exams_count }}</h2>
+                                </div>
+                            </div>
+                            <p class="card-text mt-3">Total examinations created</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'examination_list' %}" class="text-white">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Activities Summary Section -->
+        <div class="row mt-4 mb-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h4 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-line mr-2"></i> System Activity Summary
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-4">
+                                <div class="card border-left-info py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Recent Book Issues
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_book_issues }}</div>
+                                        <div class="text-muted small mt-2">Last 7 days</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card border-left-warning py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Room Allocations
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_room_allocations }}</div>
+                                        <div class="text-muted small mt-2">Last 7 days</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card border-left-success py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Fee Payments
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_payments }}</div>
+                                        <div class="text-muted small mt-2">Last 7 days</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="card border-left-primary py-2">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Attendance Rate
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attendance_rate }}%</div>
+                                        <div class="text-muted small mt-2">Overall average</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <a href="{% url 'report_list' %}" class="btn btn-sm btn-primary">
+                                View Detailed Reports <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Recent Activities</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Activity</th>
+                                        <th>Date & Time</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for activity in recent_activities %}
+                                        <tr>
+                                            <td>
+                                                {% if activity.action == 'login' %}
+                                                    <span class="badge bg-success">Login</span>
+                                                {% elif activity.action == 'logout' %}
+                                                    <span class="badge bg-warning">Logout</span>
+                                                {% elif activity.action == 'create' %}
+                                                    <span class="badge bg-primary">Created</span>
+                                                {% elif activity.action == 'update' %}
+                                                    <span class="badge bg-info">Updated</span>
+                                                {% elif activity.action == 'delete' %}
+                                                    <span class="badge bg-danger">Deleted</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ activity.action|title }}</span>
+                                                {% endif %}
+                                                {{ activity.module|title }}
+                                            </td>
+                                            <td>{{ activity.action_time }}</td>
+                                            <td>{{ activity.description }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="3" class="text-center">No recent activities found.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events Section -->
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Upcoming Examinations</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for exam in upcoming_exams %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ exam.exam_name }}</h5>
+                                        <small class="text-muted">{{ exam.course.course_name }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill">{{ exam.date|date:"M d, Y" }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ exam.date|date:"g:i A" }}</small>
+                                    </div>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-center">No upcoming examinations found.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Fee Payment Reminders</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for fee in due_fees %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ fee.category.name }}</h5>
+                                        <small class="text-muted">{{ fee.course.course_name }} ({{ fee.academic_year }})</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-danger rounded-pill">${{ fee.amount }}</span>
+                                        <br>
+                                        <small class="text-muted">Due on: {{ fee.due_date|date:"M d, Y" }}</small>
+                                    </div>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-center">No pending fee payments.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Landing page for non-authenticated users -->
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">College Management System</h1>
+                <p class="lead">An integrated platform for managing all aspects of educational institutions.</p>
+                <p class="mb-5">Streamline administrative tasks, enhance communication, and improve efficiency with our comprehensive college management solution.</p>
+                
+                <div class="d-grid gap-3 d-sm-flex">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4">Login</a>
+                    <a href="#features" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/landing.svg' %}" class="img-fluid" alt="College Management">
+            </div>
+        </div>
+        
+        <div class="row mt-5 pt-5" id="features">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold">Key Features</h2>
+                <p class="lead">Comprehensive tools for educational institution management.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-graduate fa-3x mb-3 text-primary"></i>
+                        <h3 class="card-title">Student Management</h3>
+                        <p class="card-text">Register students, track academic performance, manage records, and facilitate communication.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-success"></i>
+                        <h3 class="card-title">Faculty Management</h3>
+                        <p class="card-text">Manage faculty profiles, course assignments, performance tracking, and communication tools.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book-open fa-3x mb-3 text-info"></i>
+                        <h3 class="card-title">Course Management</h3>
+                        <p class="card-text">Create and modify courses, allocate faculty, manage course materials and curriculum.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-check fa-3x mb-3 text-warning"></i>
+                        <h3 class="card-title">Attendance Management</h3>
+                        <p class="card-text">Track daily attendance, generate reports, calculate percentages, and send notifications.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-alt fa-3x mb-3 text-danger"></i>
+                        <h3 class="card-title">Examination & Grades</h3>
+                        <p class="card-text">Schedule exams, manage grades, publish results, and analyze performance metrics.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-bar fa-3x mb-3 text-primary"></i>
+                        <h3 class="card-title">Reporting System</h3>
+                        <p class="card-text">Generate comprehensive reports, export data, and visualize statistics through dashboards.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5 pt-5">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold">Who It's For</h2>
+                <p class="lead">Our system serves multiple stakeholders in the educational ecosystem.</p>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Administrators</h3>
+                        <p class="card-text">Complete access to all modules, system configuration, user management, and analytics.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success"></i> Comprehensive dashboard</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Reporting tools</li>
+                            <li><i class="fas fa-check-circle text-success"></i> User management</li>
+                            <li><i class="fas fa-check-circle text-success"></i> System configuration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Faculty Members</h3>
+                        <p class="card-text">Tools to manage courses, record attendance, enter grades, and communicate with students.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success"></i> Course management</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Attendance tracking</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Grade entry</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Student communication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">Students</h3>
+                        <p class="card-text">Access to personal information, attendance status, grades, course materials, and fee status.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success"></i> Profile management</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Attendance monitoring</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Grade access</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Fee payment status</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Result | {{ result.student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'result_list' %}">Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete Result</li>
+        </ol>
+    </nav>
+    
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4>Confirm Deletion</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Warning:</strong> This action cannot be undone!
+            </div>
+            
+            <p>Are you sure you want to delete the examination result for <strong>{{ result.student.name }}</strong> in <strong>{{ result.examination.exam_name }}</strong>?</p>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Student:</strong> {{ result.student.name }} (ID: {{ result.student.student_id }})</p>
+                            <p><strong>Course:</strong> {{ result.student.course.course_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Examination:</strong> {{ result.examination.exam_name }}</p>
+                            <p><strong>Date:</strong> {{ result.examination.date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Marks:</strong> {{ result.marks_obtained }} / {{ result.examination.total_marks }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Percentage:</strong> {{ result.percentage|floatformat:2 }}%</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Grade:</strong> {{ result.grade }} ({{ result.get_status_display }})</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-danger">
+                <p><strong>The following data will be permanently deleted:</strong></p>
+                <ul>
+                    <li>Student's result record for this examination</li>
+                    <li>Associated grade and performance data</li>
+                    <li>Any remarks or feedback provided</li>
+                </ul>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'result_detail' result.result_id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Result
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Room{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-trash text-danger me-2"></i>Delete Room
+        </h1>
+        <a href="{% url 'room_list' %}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Rooms
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Delete Confirmation</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p class="mb-4">Are you sure you want to delete the following room?</p>
+                    
+                    <div class="mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Hostel:</dt>
+                                    <dd class="col-sm-8">{{ room.hostel.hostel_name }}</dd>
+                                    
+                                    <dt class="col-sm-4">Room Number:</dt>
+                                    <dd class="col-sm-8">{{ room.room_number }}</dd>
+                                    
+                                    <dt class="col-sm-4">Capacity:</dt>
+                                    <dd class="col-sm-8">{{ room.capacity }}</dd>
+                                    
+                                    <dt class="col-sm-4">Status:</dt>
+                                    <dd class="col-sm-8">
+                                        {% if room.status == 'available' %}
+                                        <span class="badge bg-success">Available</span>
+                                        {% elif room.status == 'occupied' %}
+                                        <span class="badge bg-warning">Occupied</span>
+                                        {% elif room.status == 'maintenance' %}
+                                        <span class="badge bg-danger">Under Maintenance</span>
+                                        {% endif %}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'room_list' %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirm Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

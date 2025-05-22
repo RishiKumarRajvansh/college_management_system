@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Book{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Delete Book
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone. Deleting this book will remove it from the library inventory.
+                    </div>
+                    
+                    <p>Are you sure you want to delete the following book?</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Book Details:</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Title:</strong> {{ book.title }}</li>
+                                <li class="list-group-item"><strong>Author:</strong> {{ book.author }}</li>
+                                <li class="list-group-item"><strong>ISBN:</strong> {{ book.isbn }}</li>
+                                <li class="list-group-item"><strong>Publication:</strong> {{ book.publication }}</li>
+                                <li class="list-group-item">
+                                    <strong>Status:</strong> 
+                                    {% if book.availability %}
+                                        <span class="badge bg-success">Available</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Issued</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {% if not book.availability %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Caution!</strong> This book is currently issued to a student. Deleting it may cause issues with tracking the issued book.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'book_detail' book.book_id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Yes, Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

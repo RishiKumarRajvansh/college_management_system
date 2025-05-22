@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Results | {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'result_list' %}">Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ student.name }}'s Results</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Academic Record: {{ student.name }}</h2>
+            <p class="text-muted">Student ID: {{ student.student_id }} | Course: {{ student.course.course_name }} | Year: {{ student.year }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="javascript:window.print();" class="btn btn-info">
+                <i class="fas fa-print"></i> Print Record
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Student Profile Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Student Profile</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="https://ui-avatars.com/api/?name={{ student.name|urlencode }}&size=128&background=random" class="rounded-circle img-thumbnail mb-3" alt="{{ student.name }}">
+                    <h4>{{ student.name }}</h4>
+                    <p class="text-muted mb-1">{{ student.course.course_name }}</p>
+                    <p class="text-muted">Year: {{ student.year }}</p>
+                    <hr>
+                    <div class="text-start">
+                        <p><strong>Email:</strong> {{ student.email }}</p>
+                        <p><strong>Joined:</strong> {{ student.created_at|date:"F Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Summary Card -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Academic Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h2 class="mb-1">{{ total_exams }}</h2>
+                            <div class="text-muted">Total Exams</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h2 class="mb-1">{{ passed_exams }}</h2>
+                            <div class="text-muted">Passed</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- Pass Rate Progress -->
+                    <h6>Pass Rate</h6>
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ pass_percentage }}%;" aria-valuenow="{{ pass_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ pass_percentage|floatformat:1 }}%</div>
+                    </div>
+                    
+                    <!-- Average Score Progress -->
+                    <h6>Average Score</h6>
+                    <div class="progress mb-3" style="height: 20px;">
+                        {% with avg_score=avg_percentage|floatformat:1 %}
+                        <div class="progress-bar 
+                            {% if avg_score >= 80 %}bg-success
+                            {% elif avg_score >= 60 %}bg-primary
+                            {% elif avg_score >= 40 %}bg-warning
+                            {% else %}bg-danger{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ avg_score }}%;" 
+                            aria-valuenow="{{ avg_score }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">{{ avg_score }}%</div>
+                        {% endwith %}
+                    </div>
+
+                    <!-- Grade Distribution -->
+                    <h6>Grade Distribution</h6>
+                    <div class="row text-center small">
+                        {% with grade_counts=results|regroup_by:'grade' %}
+                        {% for grade, count in grade_distribution.items %}
+                        <div class="col-3 mb-2">
+                            <div class="border rounded p-1">
+                                <div class="
+                                    {% if grade == 'A+' or grade == 'A' %}text-success
+                                    {% elif grade == 'B+' or grade == 'B' %}text-primary
+                                    {% elif grade == 'C+' or grade == 'C' %}text-info
+                                    {% elif grade == 'D' %}text-warning
+                                    {% else %}text-danger{% endif %}">
+                                    {{ grade }}
+                                </div>
+                                <div>{{ count }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <!-- Semester-wise Results Tabs -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="resultsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-results" type="button" role="tab" aria-controls="all-results" aria-selected="true">All Results</button>
+                        </li>
+                        {% for course_name, course_results in courses.items %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="{{ course_name|slugify }}-tab" data-bs-toggle="tab" data-bs-target="#{{ course_name|slugify }}-results" type="button" role="tab" aria-controls="{{ course_name|slugify }}-results" aria-selected="false">{{ course_name }}</button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="resultsTabsContent">
+                        <div class="tab-pane fade show active" id="all-results" role="tabpanel" aria-labelledby="all-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Examination</th>
+                                            <th>Type</th>
+                                            <th>Course</th>
+                                            <th>Marks</th>
+                                            <th>Grade</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in results %}
+                                        <tr>
+                                            <td>{{ result.examination.date|date:"M d, Y" }}</td>
+                                            <td>{{ result.examination.exam_name }}</td>
+                                            <td>{{ result.examination.get_exam_type_display }}</td>
+                                            <td>{{ result.examination.course.course_name }}</td>
+                                            <td>{{ result.marks_obtained }} / {{ result.examination.total_marks }}</td>
+                                            <td>
+                                                {% if result.grade == 'A+' %}<span class="badge bg-success">A+</span>
+                                                {% elif result.grade == 'A' %}<span class="badge bg-success">A</span>
+                                                {% elif result.grade == 'B+' %}<span class="badge bg-primary">B+</span>
+                                                {% elif result.grade == 'B' %}<span class="badge bg-primary">B</span>
+                                                {% elif result.grade == 'C+' %}<span class="badge bg-info">C+</span>
+                                                {% elif result.grade == 'C' %}<span class="badge bg-info">C</span>
+                                                {% elif result.grade == 'D' %}<span class="badge bg-warning">D</span>
+                                                {% elif result.grade == 'F' %}<span class="badge bg-danger">F</span>
+                                                {% else %}<span class="badge bg-secondary">-</span>{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if result.status == 'pass' %}<span class="badge bg-success">Pass</span>
+                                                {% elif result.status == 'fail' %}<span class="badge bg-danger">Fail</span>
+                                                {% elif result.status == 'absent' %}<span class="badge bg-warning">Absent</span>
+                                                {% else %}<span class="badge bg-secondary">Incomplete</span>{% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'result_detail' result.result_id %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="8" class="text-center">No results found.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        {% for course_name, course_results in courses.items %}
+                        <div class="tab-pane fade" id="{{ course_name|slugify }}-results" role="tabpanel" aria-labelledby="{{ course_name|slugify }}-tab">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Examination</th>
+                                            <th>Type</th>
+                                            <th>Marks</th>
+                                            <th>Grade</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for result in course_results %}
+                                        <tr>
+                                            <td>{{ result.examination.date|date:"M d, Y" }}</td>
+                                            <td>{{ result.examination.exam_name }}</td>
+                                            <td>{{ result.examination.get_exam_type_display }}</td>
+                                            <td>{{ result.marks_obtained }} / {{ result.examination.total_marks }}</td>
+                                            <td>
+                                                {% if result.grade == 'A+' %}<span class="badge bg-success">A+</span>
+                                                {% elif result.grade == 'A' %}<span class="badge bg-success">A</span>
+                                                {% elif result.grade == 'B+' %}<span class="badge bg-primary">B+</span>
+                                                {% elif result.grade == 'B' %}<span class="badge bg-primary">B</span>
+                                                {% elif result.grade == 'C+' %}<span class="badge bg-info">C+</span>
+                                                {% elif result.grade == 'C' %}<span class="badge bg-info">C</span>
+                                                {% elif result.grade == 'D' %}<span class="badge bg-warning">D</span>
+                                                {% elif result.grade == 'F' %}<span class="badge bg-danger">F</span>
+                                                {% else %}<span class="badge bg-secondary">-</span>{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if result.status == 'pass' %}<span class="badge bg-success">Pass</span>
+                                                {% elif result.status == 'fail' %}<span class="badge bg-danger">Fail</span>
+                                                {% elif result.status == 'absent' %}<span class="badge bg-warning">Absent</span>
+                                                {% else %}<span class="badge bg-secondary">Incomplete</span>{% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'result_detail' result.result_id %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No results found for this course.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Trends Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Performance Trends</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-chart-line"></i>
+                        Performance charts would appear here, showing the student's grade trends over time.
+                        This would require integration with a charting library like Chart.js or D3.js.
+                    </div>
+                    
+                    <!-- Summary Table -->
+                    <h6 class="mt-4">Performance Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Exam Type</th>
+                                    <th>Count</th>
+                                    <th>Average Score</th>
+                                    <th>Best Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% with midterms=results|filter_by:"examination.exam_type,midterm" %}
+                                <tr>
+                                    <td>Mid Term</td>
+                                    <td>{{ midterms|length }}</td>
+                                    <td>{{ midterms|average:"percentage"|floatformat:2 }}%</td>
+                                    <td>{{ midterms|best_grade }}</td>
+                                </tr>
+                                {% endwith %}
+                                
+                                {% with finals=results|filter_by:"examination.exam_type,final" %}
+                                <tr>
+                                    <td>Final Exam</td>
+                                    <td>{{ finals|length }}</td>
+                                    <td>{{ finals|average:"percentage"|floatformat:2 }}%</td>
+                                    <td>{{ finals|best_grade }}</td>
+                                </tr>
+                                {% endwith %}
+                                
+                                {% with quizzes=results|filter_by:"examination.exam_type,quiz" %}
+                                <tr>
+                                    <td>Quizzes</td>
+                                    <td>{{ quizzes|length }}</td>
+                                    <td>{{ quizzes|average:"percentage"|floatformat:2 }}%</td>
+                                    <td>{{ quizzes|best_grade }}</td>
+                                </tr>
+                                {% endwith %}
+                                
+                                {% with assignments=results|filter_by:"examination.exam_type,assignment" %}
+                                <tr>
+                                    <td>Assignments</td>
+                                    <td>{{ assignments|length }}</td>
+                                    <td>{{ assignments|average:"percentage"|floatformat:2 }}%</td>
+                                    <td>{{ assignments|best_grade }}</td>
+                                </tr>
+                                {% endwith %}
+                                
+                                {% with projects=results|filter_by:"examination.exam_type,project" %}
+                                <tr>
+                                    <td>Projects</td>
+                                    <td>{{ projects|length }}</td>
+                                    <td>{{ projects|average:"percentage"|floatformat:2 }}%</td>
+                                    <td>{{ projects|best_grade }}</td>
+                                </tr>
+                                {% endwith %}
+                            </tbody>
+                            <tfoot class="table-primary">
+                                <tr>
+                                    <th>Overall</th>
+                                    <th>{{ total_exams }}</th>
+                                    <th>{{ avg_percentage|floatformat:2 }}%</th>
+                                    <th>{{ results|best_grade }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style media="print">
+    @page {
+        size: A4;
+        margin: 1cm;
+    }
+    .breadcrumb, .btn, nav, footer, .nav-tabs, .card-header-tabs {
+        display: none !important;
+    }
+    .card {
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+        margin-bottom: 15px !important;
+    }
+    .card-header {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    .tab-content > .tab-pane {
+        display: block !important;
+        opacity: 1 !important;
+    }
+    .tab-pane:not(#all-results) {
+        page-break-before: always;
+    }
+    .badge {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background-color: #fff !important;
+    }
+</style>
+{% endblock %}

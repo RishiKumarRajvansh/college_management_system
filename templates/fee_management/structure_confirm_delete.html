@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Fee Structure{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Delete Fee Structure
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone. Deleting this fee structure may impact payment records.
+                    </div>
+                    
+                    <p>Are you sure you want to delete the following fee structure?</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Fee Structure Details:</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Category:</strong> {{ structure.category.name }}</li>
+                                <li class="list-group-item"><strong>Course:</strong> {{ structure.course.course_name }}</li>
+                                <li class="list-group-item"><strong>Academic Year:</strong> {{ structure.academic_year }}</li>
+                                <li class="list-group-item"><strong>Amount:</strong> ${{ structure.amount|floatformat:2 }}</li>
+                                <li class="list-group-item"><strong>Due Date:</strong> {{ structure.due_date|date:"M d, Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'fee_structure_detail' structure.fee_structure_id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Yes, Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

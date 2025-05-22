@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Library Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">
+        <i class="fas fa-book text-primary me-2"></i>
+        Library Management Dashboard
+    </h1>
+    
+    <div class="row">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Books</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_books }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Available Books</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ available_books }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Issued Books</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ issued_books }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'book_create' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus-circle me-2"></i> Add New Book
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'book_issue_create' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-exchange-alt me-2"></i> Issue Book
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'book_list' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-list me-2"></i> All Books
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'book_issue_list' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-history me-2"></i> Issue Records
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Issues</h6>
+                    <a href="{% url 'book_issue_list' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Book</th>
+                                    <th>Issue Date</th>
+                                    <th>Return By</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_issues %}
+                                    {% for issue in recent_issues %}
+                                    <tr>
+                                        <td>{{ issue.student.user.get_full_name }}</td>
+                                        <td>{{ issue.book.title }}</td>
+                                        <td>{{ issue.issue_date|date:"M d, Y" }}</td>
+                                        <td>{{ issue.return_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'book_return' issue.issue_id %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-undo"></i> Return
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No current issued books found.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recently Added Books</h6>
+                    <a href="{% url 'book_list' %}" class="btn btn-sm btn-primary">View All Books</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>ISBN</th>
+                                    <th>Publication</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_books %}
+                                    {% for book in recent_books %}
+                                    <tr>
+                                        <td>{{ book.title }}</td>
+                                        <td>{{ book.author }}</td>
+                                        <td>{{ book.isbn }}</td>
+                                        <td>{{ book.publication }}</td>
+                                        <td>
+                                            {% if book.availability %}
+                                                <span class="badge bg-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Issued</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'book_detail' book.book_id %}" class="btn btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'book_update' book.book_id %}" class="btn btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No books found in the library.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

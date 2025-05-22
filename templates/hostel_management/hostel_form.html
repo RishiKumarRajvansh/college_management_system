@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if hostel %}Edit Hostel{% else %}New Hostel{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-building text-primary me-2"></i> 
+            {% if hostel %}Edit Hostel{% else %}New Hostel{% endif %}
+        </h1>
+        <a href="{% if hostel %}{% url 'hostel_detail' hostel.pk %}{% else %}{% url 'hostel_list' %}{% endif %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                {% if hostel %}Edit {{ hostel.hostel_name }}{% else %}Create New Hostel{% endif %}
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="row mb-3">
+                    <label for="{{ form.hostel_name.id_for_label }}" class="col-md-3 col-form-label">Hostel Name:</label>
+                    <div class="col-md-9">
+                        {{ form.hostel_name }}
+                        {% if form.hostel_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.hostel_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="{{ form.warden_name.id_for_label }}" class="col-md-3 col-form-label">Warden Name:</label>
+                    <div class="col-md-9">
+                        {{ form.warden_name }}
+                        {% if form.warden_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.warden_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="{{ form.contact_number.id_for_label }}" class="col-md-3 col-form-label">Contact Number:</label>
+                    <div class="col-md-9">
+                        {{ form.contact_number }}
+                        {% if form.contact_number.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.contact_number.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="{{ form.total_rooms.id_for_label }}" class="col-md-3 col-form-label">Total Rooms:</label>
+                    <div class="col-md-9">
+                        {{ form.total_rooms }}
+                        {% if form.total_rooms.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.total_rooms.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Enter the total number of rooms in this hostel.</small>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        {% if hostel %}Update Hostel{% else %}Create Hostel{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

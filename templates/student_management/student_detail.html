@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Details | {{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'student_list' %}">Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ student.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Student Details</h2>
+                <div>
+                    {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'student_update' student.student_id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'student_delete' student.student_id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name={{ student.name|urlencode }}&size=128&background=random" class="rounded-circle img-thumbnail" alt="{{ student.name }}">
+                        <h4 class="mt-2">{{ student.name }}</h4>
+                        <p class="text-muted">Student ID: {{ student.student_id }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <strong>Email:</strong> {{ student.email }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Course:</strong> {{ student.course.course_name }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Year:</strong> {{ student.year }}
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col">
+                            <small>Created: {{ student.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="col text-end">
+                            <small>Updated: {{ student.updated_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Academic Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Academic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Attendance Summary</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                            </div>
+                            <small class="text-muted">Overall attendance rate</small>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Current GPA</h6>
+                            <div class="h3 text-center">3.75</div>
+                            <small class="text-muted text-center d-block">Out of 4.0</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="#" class="btn btn-outline-primary">View Full Academic Record</a>
+                </div>
+            </div>
+
+            <!-- Current Courses Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Current Courses</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Database Management Systems</h6>
+                                <span class="badge bg-primary">Ongoing</span>
+                            </div>
+                            <small class="text-muted">Prof. Robert Smith | Monday, Wednesday 10:00 AM</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Computer Networks</h6>
+                                <span class="badge bg-primary">Ongoing</span>
+                            </div>
+                            <small class="text-muted">Prof. Jane Doe | Tuesday, Thursday 2:00 PM</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Software Engineering</h6>
+                                <span class="badge bg-primary">Ongoing</span>
+                            </div>
+                            <small class="text-muted">Prof. Michael Johnson | Friday 1:00 PM</small>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="#" class="btn btn-outline-primary">View All Courses</a>
+                </div>
+            </div>
+
+            <!-- Recent Activity Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Today</div>
+                            <div class="timeline-content">
+                                <p>Attended Database Management Systems lecture</p>
+                                <span class="badge bg-info">Attendance</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Yesterday</div>
+                            <div class="timeline-content">
+                                <p>Submitted Software Engineering assignment</p>
+                                <span class="badge bg-success">Assignment</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">3 days ago</div>
+                            <div class="timeline-content">
+                                <p>Attended Computer Networks lab session</p>
+                                <span class="badge bg-info">Attendance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    height: 100%;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+.timeline-item:last-child:before {
+    height: 50%;
+}
+
+.timeline-date {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.timeline-content {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.timeline-item:after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #007bff;
+}
+</style>
+{% endblock %}

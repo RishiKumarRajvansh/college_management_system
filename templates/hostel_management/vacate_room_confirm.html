@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vacate Room{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-door-open text-warning me-2"></i>Vacate Room
+        </h1>
+        <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Allocations
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Vacate Room Confirmation</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Notice:</strong> This will mark the allocation as inactive and free up the room for other students.
+                    </div>
+                    
+                    <p class="mb-4">Are you sure you want to vacate the following room allocation?</p>
+                    
+                    <div class="mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Student Information</h5>
+                                        <dl>
+                                            <dt>Name:</dt>
+                                            <dd>{{ allocation.student.name }}</dd>
+                                            
+                                            <dt>Student ID:</dt>
+                                            <dd>{{ allocation.student.student_id }}</dd>
+                                            
+                                            <dt>Course:</dt>
+                                            <dd>{{ allocation.student.course.course_name }}</dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Room Information</h5>
+                                        <dl>
+                                            <dt>Hostel:</dt>
+                                            <dd>{{ allocation.room.hostel.hostel_name }}</dd>
+                                            
+                                            <dt>Room Number:</dt>
+                                            <dd>{{ allocation.room.room_number }}</dd>
+                                            
+                                            <dt>Allocation Date:</dt>
+                                            <dd>{{ allocation.allocation_date|date:"F d, Y" }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="d-flex justify-content-center">
+                            <a href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'allocation_list' %}{% endif %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-door-open me-2"></i>Confirm Vacate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

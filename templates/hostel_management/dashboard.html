@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hostel Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">
+        <i class="fas fa-building text-primary me-2"></i>
+        Hostel Management Dashboard
+    </h1>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Hostels</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_hostels }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Rooms</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_rooms }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-door-open fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Available Rooms</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ available_rooms }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Current Allocations</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_allocations }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Hostel Occupancy Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hostel Occupancy Rates</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="hostelOccupancyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Room Status Doughnut Chart -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Room Status Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="roomStatusChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Available
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-danger"></i> Occupied
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-warning"></i> Maintenance
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Allocations Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Hostel Allocations</h6>
+                    <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-primary">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Hostel</th>
+                                    <th>Room</th>
+                                    <th>Allocation Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for allocation in recent_allocations %}
+                                <tr>
+                                    <td>{{ allocation.student.name }}</td>
+                                    <td>{{ allocation.room.hostel.hostel_name }}</td>
+                                    <td>{{ allocation.room.room_number }}</td>
+                                    <td>{{ allocation.allocation_date }}</td>
+                                    <td>
+                                        {% if allocation.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'allocation_detail' allocation.allocation_id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No recent allocations found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row justify-content-center">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'hostel_create' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus-circle mr-1"></i> New Hostel
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'room_create' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-plus-circle mr-1"></i> New Room
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'allocation_create' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-user-plus mr-1"></i> Allocate Room
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'hostel_list' %}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-list mr-1"></i> View All Hostels
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Hostel Occupancy Bar Chart
+    var ctx = document.getElementById('hostelOccupancyChart').getContext('2d');
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for hostel in hostel_data %}'{{ hostel.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Occupancy Rate (%)',
+                data: [{% for hostel in hostel_data %}{{ hostel.occupancy_rate|floatformat:1 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%'
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Room Status Doughnut Chart
+    var ctx2 = document.getElementById('roomStatusChart').getContext('2d');
+    var myPieChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Available', 'Occupied', 'Maintenance'],
+            datasets: [{
+                data: [{{ available_rooms }}, {{ occupied_rooms }}, {{ total_rooms }} - {{ available_rooms }} - {{ occupied_rooms }}],
+                backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
+                hoverBackgroundColor: ['#17a673', '#c93325', '#dda20a'],
+                hoverBorderColor: 'rgba(234, 236, 244, 1)',
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 80,
+        },
+    });
+</script>
+{% endblock %}

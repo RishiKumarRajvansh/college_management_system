@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Payment Record{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Delete Payment Record
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone. Deleting this payment record may affect student account balances and reports.
+                    </div>
+                    
+                    <p>Are you sure you want to delete the following payment record?</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>Payment Details:</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Receipt Number:</strong> {{ payment.receipt_number }}</li>
+                                <li class="list-group-item"><strong>Student:</strong> {{ payment.student.user.get_full_name }}</li>
+                                <li class="list-group-item"><strong>Fee Category:</strong> {{ payment.fee_structure.category.name }}</li>
+                                <li class="list-group-item"><strong>Amount:</strong> ${{ payment.amount|floatformat:2 }}</li>
+                                <li class="list-group-item"><strong>Payment Date:</strong> {{ payment.payment_date|date:"M d, Y" }}</li>
+                                <li class="list-group-item"><strong>Status:</strong> {{ payment.get_status_display }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'payment_detail' payment.payment_id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Yes, Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
