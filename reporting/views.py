@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 
-from .models import Report
+from .models import Report, Notification
 from .forms import (
     ReportForm, StudentReportForm, FacultyReportForm, AttendanceReportForm, 
     ExaminationReportForm, FeeReportForm, LibraryReportForm, HostelReportForm, 
@@ -40,14 +40,14 @@ from hostel_management.models import Hostel, Room, HostelAllocation
 
 @login_required
 def dashboard(request):
-    """Dashboard view for the reporting module"""
-    # Count reports by type
+    """Dashboard view for the reporting module"""    # Count reports by type
     report_counts = Report.objects.values('report_type').annotate(count=Count('report_id'))
     report_types_dict = dict(Report.REPORT_TYPES)
     
-    # Format the report counts for the chart
+    # Format the report counts for the chart (for reference on the server side)
     report_types = []
     report_counts_values = []
+    
     for item in report_counts:
         report_type = report_types_dict.get(item['report_type'], item['report_type'])
         report_types.append(report_type)
@@ -63,20 +63,16 @@ def dashboard(request):
     total_students = Student.objects.count()
     total_faculty = Faculty.objects.count()
     total_courses = Course.objects.count()
+      # Get unread notifications count for the current user
+    unread_notifications_count = Notification.objects.filter(
+        user=request.user,
+        read=False
+    ).count()
     
-    # Create charts for the dashboard
-    # Report types pie chart
-    plt.figure(figsize=(8, 6))
-    plt.pie(report_counts_values, labels=report_types, autopct='%1.1f%%', startangle=140)
-    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle
-    plt.title('Reports by Type')
-    
-    # Save the chart to a BytesIO object
-    buffer = BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    chart_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
-    plt.close()
+    # Get latest notifications for the dashboard
+    latest_notifications = Notification.objects.filter(
+        user=request.user
+    ).order_by('-created_at')[:10]
     
     context = {
         'report_counts': report_counts,
@@ -85,7 +81,8 @@ def dashboard(request):
         'total_students': total_students,
         'total_faculty': total_faculty,
         'total_courses': total_courses,
-        'chart_image': chart_image,
+        'unread_notifications_count': unread_notifications_count,
+        'latest_notifications': latest_notifications,
     }
     
     return render(request, 'reporting/dashboard.html', context)

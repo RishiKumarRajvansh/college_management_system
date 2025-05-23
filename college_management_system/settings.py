@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Custom middleware
+    'user_authentication.middleware.ForcePasswordChangeMiddleware',
 ]
 
 ROOT_URLCONF = 'college_management_system.urls'

@@ -3,16 +3,20 @@
 {% block title %}Results | All Examination Results{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-4">
+<div class="container mt-4">    <div class="row mb-4">
         <div class="col-md-8">
             <h2>Examination Results</h2>
         </div>
         <div class="col-md-4 text-end">
             {% if user.is_staff or user.is_superuser or user.faculty_profile %}
-            <a href="{% url 'result_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add Result
-            </a>
+            <div class="btn-group">
+                <a href="{% url 'result_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Result
+                </a>
+                <a href="{% url 'bulk_result_create' %}" class="btn btn-success">
+                    <i class="fas fa-users"></i> Bulk Entry
+                </a>
+            </div>
             {% endif %}
         </div>
     </div>

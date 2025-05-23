@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Process Password Reset - College Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Process Password Reset Request</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'admin_reset_requests' %}">Reset Requests</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Process Request</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'admin_reset_requests' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Requests
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">User Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="fw-bold">Username:</label>
+                        <p>{{ reset_request.user.username }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Email:</label>
+                        <p>{{ reset_request.user.email }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">User Type:</label>
+                        <p>{{ reset_request.user.profile.get_user_type_display }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Date Requested:</label>
+                        <p>{{ reset_request.requested_at|date:"F d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Process Request</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.new_password.id_for_label }}" class="form-label">New Password</label>
+                            {{ form.new_password }}
+                            <div class="form-text text-muted">{{ form.new_password.help_text }}</div>
+                            {% if form.new_password.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.new_password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.status.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.notes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirm-reset" required>
+                                <label class="form-check-label" for="confirm-reset">
+                                    I confirm that I want to reset the password for this user.
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{% url 'admin_reset_requests' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

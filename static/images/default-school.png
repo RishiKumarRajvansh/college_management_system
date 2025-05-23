@@ -1,0 +1,11 @@
+<!-- Default school image for College Management System -->
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="600" height="400" fill="#f8f9fa"/>
+    <path d="M300,80 L100,200 L500,200 Z" fill="#6c757d"/>
+    <rect x="150" y="200" width="300" height="150" fill="#495057"/>
+    <rect x="250" y="250" width="100" height="100" fill="#343a40"/>
+    <rect x="275" y="300" width="50" height="50" fill="#f8f9fa"/>
+    <rect x="170" y="220" width="50" height="50" fill="#17a2b8"/>
+    <rect x="380" y="220" width="50" height="50" fill="#17a2b8"/>
+    <text x="300" y="370" font-family="Arial" font-size="16" fill="#343a40" text-anchor="middle">College Management System</text>
+</svg>

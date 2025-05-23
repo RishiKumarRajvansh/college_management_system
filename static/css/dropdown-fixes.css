@@ -1,0 +1,37 @@
+/* Additional fixes for sidebar dropdown spacing */
+.sidebar-menu .dropdown {
+    margin-bottom: 0;
+}
+
+.sidebar-menu .dropdown-menu {
+    margin-top: 0;
+    margin-bottom: 0;
+    max-height: none;
+    position: static !important;
+    transform: none !important;
+}
+
+/* Ensure dropdown items don't overlap */
+.sidebar-menu .nav-item {
+    position: relative;
+}
+
+/* Add spacing after each dropdown when it's open */
+.sidebar-menu .dropdown.show {
+    padding-bottom: 6px;
+}
+
+/* Improve overflow behavior */
+.sidebar-menu {
+    overflow-x: hidden;
+}
+
+/* Fix z-index for collapsed sidebar */
+#sidebar-wrapper.collapsed .dropdown {
+    position: static;
+}
+
+#sidebar-wrapper.collapsed .dropdown-menu {
+    position: absolute !important;
+    z-index: 1060;
+}

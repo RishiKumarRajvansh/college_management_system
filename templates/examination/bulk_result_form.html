@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Examination Management | Bulk Result Entry{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'result_list' %}">Results</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Bulk Result Entry</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Bulk Result Entry</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {{ form.examination.label_tag }}
+                            {{ form.examination }}
+                            {% if form.examination.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.examination.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if form.examination.value %}
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Enter Results for Students</h5>
+                        </div>
+                    </div>
+                    
+                    {% for field in form %}
+                        {% if field.name != 'examination' %}
+                            {% if field.name|slice:":6" == "marks_" %}
+                                {% with student_id=field.name|slice:"6:" %}
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-light">
+                                            {{ field.label }}
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Marks</label>
+                                                        {{ field }}
+                                                        {% if field.errors %}
+                                                            <div class="invalid-feedback d-block">
+                                                                {% for error in field.errors %}
+                                                                    {{ error }}
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Status</label>
+                                                        {{ form.status_student_id }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Remarks</label>
+                                                        {{ form.remarks_student_id }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endwith %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        Please select an examination to proceed with bulk result entry.
+                    </div>
+                {% endif %}
+                
+                <div class="form-group text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Results
+                    </button>
+                    <a href="{% url 'result_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form when examination selection changes to load student fields
+        const examinationSelect = document.getElementById('id_examination');
+        if (examinationSelect) {
+            examinationSelect.addEventListener('change', function() {
+                if (this.value) {
+                    this.form.submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

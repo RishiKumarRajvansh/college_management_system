@@ -3,6 +3,97 @@
 
 {% block title %}Reporting Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>    .chart-container {        position: relative;
+        height: 300px;
+        width: 100%;
+        min-height: 250px;
+        max-height: 500px;
+    }
+      @media (max-width: 768px) {
+        .chart-container {
+            height: 200px;
+            min-height: 180px;
+        }
+        .mobile-mb-4 {
+            margin-bottom: 1.5rem !important;
+        }
+        .mobile-full-width {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .chart-container {
+            height: 180px;
+            min-height: 150px;
+        }
+        .mobile-mb-4 {
+            margin-bottom: 1.5rem !important;
+        }
+        .mobile-full-width {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .chart-container {
+            height: 180px;
+            min-height: 150px;
+        }
+    }
+    
+    .notification-item {
+        padding: 12px;
+        border-bottom: 1px solid #e3e6f0;
+        transition: background-color 0.2s;
+    }
+    
+    .notification-item:hover {
+        background-color: #f8f9fc;
+    }
+    
+    .notification-item.unread {
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .notification-item .notification-timestamp {
+        font-size: 0.7rem;
+        color: #858796;
+    }
+    
+    .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .badge-notification {
+        position: absolute;
+        font-size: 0.5rem;
+        padding: 0.25rem 0.4rem;
+        border-radius: 50%;
+        top: 0;
+        right: 0;
+        transform: translate(25%, -25%);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<!-- Custom Dashboard JS -->
+<script src="{% static 'js/dashboard.js' %}"></script>
+<!-- Notifications JS -->
+<script src="{% static 'js/notifications.js' %}"></script>
+<!-- Notification Refresh JS -->
+<script src="{% static 'js/notification-refresh.js' %}"></script>
+<!-- Tooltip Initialization -->
+<script src="{% static 'js/tooltip-init.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <h1 class="mb-4">
@@ -80,32 +171,25 @@
             </div>
         </div>
     </div>
-    
-    <!-- Report Types Chart and Quick Actions -->
+      <!-- Report Types Chart and Quick Actions -->
     <div class="row">
         <!-- Report Types Chart -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <div class="col-xl-8 col-lg-7 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4"><div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Reports by Type</h6>
-                </div>
-                <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        {% if chart_image %}
-                        <img src="data:image/png;base64,{{ chart_image }}" class="img-fluid" alt="Reports by Type Chart">
-                        {% else %}
-                        <div class="text-center">
-                            <p>No data available for report types.</p>
-                        </div>
-                        {% endif %}
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="attendanceChartCanvas" data-bs-toggle="tooltip" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div><div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="attendanceChartCanvas"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
+          <!-- Quick Actions -->
+        <div class="col-xl-4 col-lg-5 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
                 </div>
@@ -151,9 +235,77 @@
     
     <!-- Recent Reports and Scheduled Reports -->
     <div class="row">
-        <!-- Recent Reports -->
-        <div class="col-lg-6">
-            <div class="card shadow mb-4">
+        <!-- Recent Reports -->        <!-- Analytics Charts Row -->
+        <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4"><div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Exam Performance Analytics</h6>
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="examPerformanceCanvas" data-bs-toggle="tooltip" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="examPerformanceCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+          <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Enrollment Trends</h6>
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="enrollmentChartCanvas" data-bs-toggle="tooltip" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="enrollmentChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fee Collection and Notifications Row -->
+    <div class="row">        <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Fee Collection Analytics</h6>
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="feeCollectionCanvas" data-bs-toggle="tooltip" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="feeCollectionCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+          <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Notifications</h6>                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" id="refreshNotifications" data-bs-toggle="tooltip" title="Refresh Notifications">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <a href="#" class="btn btn-sm btn-primary" id="markAllRead" data-bs-toggle="tooltip" title="Mark All Notifications as Read">Mark all read</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="notification-list" id="notificationContainer">
+                        <div class="text-center" id="loadingNotifications">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reports Row -->
+    <div class="row">        <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Reports</h6>
                     <a href="{% url 'report_list' %}" class="btn btn-sm btn-primary">View All</a>
@@ -192,10 +344,9 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Scheduled Reports -->
-        <div class="col-lg-6">
-            <div class="card shadow mb-4">
+          <!-- Scheduled Reports -->
+        <div class="col-lg-6 mobile-full-width">
+            <div class="card shadow mb-4 mobile-mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Scheduled Reports</h6>
                 </div>

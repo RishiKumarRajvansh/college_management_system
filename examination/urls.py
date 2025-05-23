@@ -12,6 +12,7 @@ urlpatterns = [
     # Result URLs
     path('results/', views.result_list, name='result_list'),
     path('results/create/', views.result_create, name='result_create'),
+    path('results/bulk-create/', views.bulk_result_create, name='bulk_result_create'),
     path('exams/<int:examination_id>/results/create/', views.result_create, name='result_create_for_exam'),
     path('results/<int:pk>/', views.result_detail, name='result_detail'),
     path('results/<int:pk>/update/', views.result_update, name='result_update'),

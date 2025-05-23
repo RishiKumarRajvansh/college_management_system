@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import Group, Permission
 from .forms import UserRegistrationForm, UserProfileForm, UserUpdateForm
 from .models import UserProfile, AuditTrail
 
@@ -9,14 +10,53 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Create user profile
+            # Get the user_type selection
             user_type = form.cleaned_data.get('user_type')
             phone_number = form.cleaned_data.get('phone_number')
+            
+            # Set Django permissions based on user_type
+            if user_type == 'admin':
+                user.is_staff = True  # Can access admin site
+                user.is_superuser = True  # Has all permissions
+            elif user_type == 'faculty':
+                user.is_staff = True  # Faculty can access admin site but not superuser
+                user.is_superuser = False
+            else:  # student
+                user.is_staff = False
+                user.is_superuser = False
+                
+            # Save the updated user object
+            user.save()            # Create user profile
             UserProfile.objects.create(
                 user=user,
                 user_type=user_type,
-                phone_number=phone_number
+                phone_number=phone_number,
+                is_first_login=False  # Self-registered users choose their own password
             )
+            
+            # Create corresponding records based on user_type
+            if user_type == 'student':
+                # Import here to avoid circular imports
+                from student_management.models import Student
+                
+                # Create Student record
+                Student.objects.create(
+                    user=user,
+                    name=f"{user.first_name} {user.last_name}".strip(),
+                    email=user.email,
+                    student_id=f"ST{user.id:06d}"  # Generate a student ID based on user ID
+                )
+            elif user_type == 'faculty':
+                # Import here to avoid circular imports
+                from faculty_management.models import Faculty
+                
+                # Create Faculty record
+                Faculty.objects.create(
+                    user=user,
+                    name=f"{user.first_name} {user.last_name}".strip(),
+                    email=user.email,
+                    faculty_id=f"FA{user.id:06d}"  # Generate a faculty ID based on user ID
+                )
             
             # Create audit trail
             AuditTrail.objects.create(
@@ -30,7 +70,7 @@ def register(request):
             )
             
             # Display success message
-            messages.success(request, f'Account created for {user.username}. You can now log in.')
+            messages.success(request, f'Account created for {user.username} as {user_type}. You can now log in.')
             return redirect('login')
     else:
         form = UserRegistrationForm()

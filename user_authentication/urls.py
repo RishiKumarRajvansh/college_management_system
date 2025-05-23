@@ -4,6 +4,8 @@ from django.contrib.auth import views as auth_views
 from django.views.decorators.http import require_POST
 from .forms import LoginForm, PasswordChangingForm
 from .views_auth import CustomLoginView
+from .views_password import force_password_change
+from .views_password_reset import request_password_reset, admin_reset_requests, process_reset_request
 
 urlpatterns = [
     # Login view is now handled at the project level
@@ -21,16 +23,8 @@ urlpatterns = [
     path('password-changed/', auth_views.PasswordChangeDoneView.as_view(
         template_name='user_authentication/password_changed.html'
     ), name='password_changed'),
-    path('password-reset/', auth_views.PasswordResetView.as_view(
-        template_name='user_authentication/password_reset.html'
-    ), name='password_reset'),
-    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(
-        template_name='user_authentication/password_reset_done.html'
-    ), name='password_reset_done'),
-    path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name='user_authentication/password_reset_confirm.html'
-    ), name='password_reset_confirm'),
-    path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(
-        template_name='user_authentication/password_reset_complete.html'
-    ), name='password_reset_complete'),
+    # Custom password reset paths
+    path('password-reset/', request_password_reset, name='password_reset'),    path('admin-reset-requests/', admin_reset_requests, name='admin_reset_requests'),
+    path('process-reset-request/<uuid:request_id>/', process_reset_request, name='process_reset_request'),
+    path('force-password-change/', force_password_change, name='force_password_change'),
 ]

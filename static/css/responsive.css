@@ -1,0 +1,342 @@
+/* Additional custom styles for the College Management System */
+
+/* Better mobile styles for the dashboard */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .row {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+    
+    .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, 
+    .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, 
+    .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, 
+    .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, 
+    .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, 
+    .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, 
+    .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, 
+    .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, 
+    .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, 
+    .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, 
+    .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, 
+    .col-xl-auto {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    
+    h1.mb-4 {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .card {
+        margin-bottom: 10px;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table th, .table td {
+        padding: 0.5rem;
+    }
+    
+    /* Enhanced notification styles for mobile */
+    .dropdown-notification {
+        max-width: 300px;
+        left: auto !important;
+        right: 0 !important;
+        transform: none !important;
+    }
+    
+    .notification-item {
+        padding: 8px;
+    }
+    
+    .notification-message {
+        font-size: 0.85rem;
+    }
+    
+    /* Better sidebar collapse behavior */
+    .sidebar.toggled .nav-item .nav-link {
+        padding: 0.5rem;
+        text-align: center;
+    }
+    
+    .sidebar.toggled .nav-item .nav-link span {
+        display: none;
+    }
+    
+    .sidebar.toggled {
+        width: 5rem !important;
+    }
+    
+    .sidebar.toggled .nav-item {
+        margin: 0;
+    }
+    
+    /* Improve chart container spacing */
+    .chart-container {
+        margin-bottom: 1rem;
+    }
+    
+    /* Better table responsiveness */
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    /* Stacked forms on mobile */
+    .form-inline .form-control {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Fix notification badge positioning */
+    .notification-badge {
+        transform: translate(25%, -50%);
+    }
+}
+
+/* Extra small devices (portrait phones) */
+@media (max-width: 575.98px) {
+    /* Header optimizations */
+    .navbar-brand {
+        font-size: 1rem;
+        padding: 0.5rem 0;
+    }
+    
+    .topbar .navbar-search {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+    
+    /* Smaller padding for main content */
+    .container-fluid {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    
+    /* Optimize card headings */
+    .card-header h6 {
+        font-size: 0.95rem;
+    }
+    
+    /* Shrink chart height for very small screens */
+    .chart-container {
+        height: 160px !important;
+        min-height: 150px !important;
+    }
+    
+    /* Optimize dropdowns */
+    .dropdown-menu {
+        width: 220px;
+        font-size: 0.85rem;
+    }
+    
+    /* Make buttons more prominent */
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Button groups should be stacked */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Fix notification appearance */
+    #notificationDropdownContainer {
+        width: 250px;
+        max-height: 300px;
+    }
+    
+    /* Reduce font sizes */
+    body {
+        font-size: 0.875rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+    }
+    
+    /* Full width modal for better UX */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: none;
+    }
+    
+    /* Optimize login page */
+    .bg-login-image {
+        display: none;
+    }
+    
+    /* More prominent export buttons */
+    .export-link {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Medium devices (tablets) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Optimize the sidebar */
+    .sidebar {
+        width: 14rem !important;
+    }
+    
+    .sidebar .nav-item .nav-link {
+        padding: 0.75rem;
+    }
+    
+    /* Adjust card grid on tablets */
+    .col-lg-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Better notification dropdown position */
+    .dropdown-notification {
+        left: auto !important;
+        right: 1rem !important;
+    }
+}
+
+/* Landscape orientation optimizations */
+@media (max-height: 480px) and (orientation: landscape) {
+    /* Optimize sidebar in landscape */
+    .sidebar {
+        overflow-y: auto;
+        max-height: 100vh;
+    }
+    
+    /* Optimize modals in landscape */
+    .modal-body {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    /* Reduce chart height */
+    .chart-container {
+        height: 150px;
+        min-height: 140px;
+    }
+}
+
+/* Improve notification badge positioning */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    transform: translate(25%, -25%);
+}
+
+/* Full width content when sidebar is hidden */
+#content-wrapper.full-width {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* Better table responsiveness */
+.table-responsive {
+    overflow-x: auto;
+    /* Improve touch scrolling */
+    overflow-scrolling: touch;
+}
+
+/* Improve tooltip appearance */
+.tooltip {
+    font-size: 0.8rem;
+}
+
+/* Add animation for chart refresh */
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.chart-container canvas {
+    animation: fade-in 0.5s ease-in-out;
+}
+
+/* Better dropdown positioning */
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+/* Better notification styling */
+.notification-item {
+    transition: all 0.2s ease;
+}
+
+.notification-item.unread {
+    border-left-width: 4px;
+}
+
+/* Print styles for reports */
+@media print {
+    /* Hide navigation elements */
+    .sidebar, .navbar, .footer, .no-print,
+    .btn, button, .card-header, .page-header {
+        display: none !important;
+    }
+    
+    /* Reset content wrapper */
+    .content-wrapper, .container-fluid, body {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Full width content */
+    .content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Ensure all content is visible */
+    .table {
+        width: 100% !important;
+        page-break-inside: auto;
+        font-size: 11pt;
+    }
+    
+    /* Add page breaks where necessary */
+    .card {
+        page-break-inside: avoid;
+    }
+    
+    /* Make sure charts print clearly */
+    .chart-container {
+        height: 350px !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Add report branding */
+    .report-header {
+        position: running(header);
+        text-align: center;
+    }
+    
+    .report-footer {
+        position: running(footer);
+        text-align: center;
+    }
+    
+    /* Expand all content */
+    .collapse {
+        display: block !important;
+        height: auto !important;
+    }
+}

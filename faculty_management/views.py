@@ -85,8 +85,23 @@ def faculty_create(request):
             faculty = form.save(commit=False)
             faculty.user = user
             faculty.save()
+              # Create user profile if it doesn't exist
+            from user_authentication.models import UserProfile
+            UserProfile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'user_type': 'faculty',
+                    'phone_number': '',
+                    'is_first_login': True  # Ensure the user is required to change password
+                }
+            )
             
-            messages.success(request, f'Faculty {faculty.name} created successfully!')
+            # Display success message with login credentials
+            messages.success(request, 
+                f'Faculty {faculty.name} created successfully! ' +
+                f'Their username is "{username}" and temporary password is "{password}". ' +
+                f'Please inform the faculty member to change their password after first login.'
+            )
             return redirect('faculty_detail', pk=faculty.faculty_id)
     else:
         form = FacultyForm()
@@ -108,10 +123,34 @@ def faculty_detail(request, pk):
         courses = faculty.courses.all()
     except:
         courses = []
+      # Get recent activities for this faculty
+    from user_authentication.models import AuditTrail
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    # Get activities from the last 30 days
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+    
+    recent_activities = AuditTrail.objects.filter(
+        user=faculty.user,
+        action_time__gte=thirty_days_ago
+    ).order_by('-action_time')[:10]  # Get the 10 most recent activities
+    
+    # Add a display date to each activity
+    for activity in recent_activities:
+        if activity.action_time.date() == today:
+            activity.display_date = f"Today at {activity.action_time.strftime('%I:%M %p')}"
+        elif activity.action_time.date() == yesterday:
+            activity.display_date = f"Yesterday at {activity.action_time.strftime('%I:%M %p')}"
+        else:
+            activity.display_date = activity.action_time.strftime('%b %d, %Y at %I:%M %p')
         
     context = {
         'faculty': faculty,
-        'courses': courses
+        'courses': courses,
+        'recent_activities': recent_activities
     }
         
     return render(request, 'faculty_management/faculty_detail.html', context)

@@ -84,8 +84,23 @@ def student_create(request):
             student = form.save(commit=False)
             student.user = user
             student.save()
+              # Create user profile if it doesn't exist
+            from user_authentication.models import UserProfile
+            UserProfile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'user_type': 'student',
+                    'phone_number': '',
+                    'is_first_login': True  # Ensure the user is required to change password
+                }
+            )
             
-            messages.success(request, f'Student {student.name} created successfully!')
+            # Display success message with login credentials
+            messages.success(request, 
+                f'Student {student.name} created successfully! ' +
+                f'Their username is "{username}" and temporary password is "{password}". ' +
+                f'Please inform the student to change their password after first login.'
+            )
             return redirect('student_detail', pk=student.student_id)
     else:
         form = StudentForm()

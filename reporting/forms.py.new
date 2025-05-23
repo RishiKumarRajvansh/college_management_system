@@ -10,7 +10,8 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ('title', 'description', 'report_type', 'parameters', 'is_scheduled', 'schedule_frequency')
-        widgets = {            'title': forms.TextInput(attrs={'class': 'form-control'}),
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'report_type': forms.Select(attrs={'class': 'form-control'}),
             'parameters': forms.JSONField(widget=forms.Textarea(attrs={'class': 'form-control'})),
@@ -128,7 +129,8 @@ class FeeReportForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-class ReportSearchForm(forms.Form):    search_query = forms.CharField(
+class ReportSearchForm(forms.Form):
+    search_query = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search by Report Title'})
     )
@@ -137,7 +139,8 @@ class ReportSearchForm(forms.Form):    search_query = forms.CharField(
         choices=[('', 'All Types')] + list(Report.REPORT_TYPES),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
-    )    is_scheduled = forms.ChoiceField(
+    )
+    is_scheduled = forms.ChoiceField(
         choices=[('', 'All Reports'), ('True', 'Scheduled Only'), ('False', 'One-time Only')],
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})

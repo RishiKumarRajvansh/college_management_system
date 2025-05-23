@@ -1,0 +1,59 @@
+/* Custom styles for College Management System */
+
+/* Full width content when sidebar is hidden */
+#content-wrapper.full-width {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Adjust padding for the content in full-width mode */
+#content-wrapper.full-width #main-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Centered container for non-authenticated pages */
+.centered-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Better notification badge positioning */
+.notification-badge {
+    position: absolute;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 50%;
+    top: 0;
+    right: -5px;
+    transform: translate(25%, -25%);
+}
+
+/* Fix for navbar user section */
+.navbar-user {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Notification icon styling */
+.notification-icon {
+    position: relative;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #content-wrapper.full-width {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

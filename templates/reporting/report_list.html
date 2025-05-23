@@ -3,6 +3,32 @@
 
 {% block title %}Reports List{% endblock %}
 
+{% block extra_css %}
+<!-- Datepicker CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-input {
+        background-color: white !important;
+    }
+    .report-status {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    .status-complete {
+        background-color: #1cc88a;
+    }
+    .status-scheduled {
+        background-color: #4e73df;
+    }
+    .status-failed {
+        background-color: #e74a3b;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -85,9 +111,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" width="100%" cellspacing="0">
-                    <thead>
+                <table class="table table-bordered table-striped" width="100%" cellspacing="0">                    <thead>
                         <tr>
+                            <th>Status</th>
                             <th>ID</th>
                             <th>Title</th>
                             <th>Type</th>
@@ -182,12 +208,31 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Datepicker library -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
     // Enable tooltips
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Initialize datepickers for date inputs
+        flatpickr("#{{ search_form.start_date.id_for_label }}", {
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            altInput: true,
+            altFormat: "F j, Y"
+        });
+        
+        flatpickr("#{{ search_form.end_date.id_for_label }}", {
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            altInput: true,
+            altFormat: "F j, Y"
+        });
         });
     });
 </script>

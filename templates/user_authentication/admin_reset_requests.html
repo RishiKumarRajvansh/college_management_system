@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Password Reset Requests - College Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Password Reset Requests</h2>
+            <p class="text-muted">
+                Manage password reset requests submitted by users. Process requests by assigning new temporary passwords.
+            </p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Reset Requests</h5>
+        </div>
+        <div class="card-body">
+            {% if requests %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Requested At</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in requests %}
+                                <tr class="{% if request.status == 'pending' %}table-warning{% elif request.status == 'processed' %}table-success{% else %}table-danger{% endif %}">
+                                    <td>{{ request.user.username }}</td>
+                                    <td>{{ request.user.email }}</td>
+                                    <td>{{ request.requested_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'processed' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ request.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if request.status == 'pending' %}
+                                            <a href="{% url 'process_reset_request' request.request_id %}" class="btn btn-sm btn-primary">Process</a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                {% if request.status == 'processed' %}Processed{% else %}Rejected{% endif %}
+                                                by {{ request.processed_by.username }}
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No password reset requests found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
