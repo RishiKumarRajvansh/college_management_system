@@ -1,0 +1,50 @@
+/* Additional sidebar fixes for collapsed view */
+#sidebar-wrapper.collapsed .sidebar-heading,
+#sidebar-wrapper.collapsed .sidebar-divider {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#sidebar-wrapper.collapsed .nav-item {
+    width: var(--sidebar-collapsed-width);
+    overflow: hidden;
+}
+
+/* Ensure dropdown items don't wrap and overflow */
+.dropdown-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fix for visible text in collapsed state */
+.sidebar-menu .dropdown > a {
+    position: relative;
+    white-space: nowrap;
+}
+
+#sidebar-wrapper.collapsed .sidebar-menu .dropdown > a > span,
+#sidebar-wrapper.collapsed .sidebar-menu .dropdown > a::after {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Improve hover effect for collapsed sidebar */
+#sidebar-wrapper.collapsed .nav-item:hover .nav-link {
+    background-color: var(--sidebar-hover);
+    border-radius: 0;
+}
+
+/* Fix for sidebar toggle button */
+.sidebar-toggle {
+    position: relative;
+    z-index: 1100;
+}
+
+/* Footer in collapsed mode */
+#sidebar-wrapper.collapsed .sidebar-footer {
+    display: none;
+}
