@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">    <!-- Custom CSS -->    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/sidebar-final.css' %}">
     <link rel="stylesheet" href="{% static 'css/dropdown-fixes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar-hover-expand.css' %}">
     <link rel="stylesheet" href="{% static 'css/custom-style.css' %}">
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
     {% block extra_css %}{% endblock %}
@@ -53,8 +54,7 @@
                                     <a class="dropdown-item" href="{% url 'student_create' %}">Add Student</a>
                                 </div>
                             </li>
-                            
-                            <li class="nav-item dropdown">
+                              <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="fas fa-chalkboard-teacher"></i>
                                     <span class="nav-text">Faculty</span>
@@ -63,6 +63,12 @@
                                     <a class="dropdown-item" href="{% url 'faculty_list' %}">All Faculty</a>
                                     <a class="dropdown-item" href="{% url 'faculty_create' %}">Add Faculty</a>
                                 </div>
+                            </li>
+                              <li class="nav-item">
+                                <a href="{% url 'auth:system_activity_logs' %}" class="nav-link">
+                                    <i class="fas fa-history"></i>
+                                    <span class="nav-text">Activity Logs</span>
+                                </a>
                             </li>
                         {% endif %}
                         
@@ -114,13 +120,14 @@
                         
                         <div class="sidebar-divider"></div>
                         <div class="sidebar-heading">Campus Services</div>
-                        
-                        <li class="nav-item dropdown">
+                          <li class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                 <i class="fas fa-book"></i>
                                 <span class="nav-text">Library</span>
                             </a>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'library_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'book_list' %}">All Books</a>
                                 <a class="dropdown-item" href="{% url 'book_issue_list' %}">Book Issues</a>
                                 {% if user.profile.user_type == 'admin' %}
@@ -130,13 +137,14 @@
                             </div>
                         </li>
                         
-                        {% if user.profile.user_type == 'admin' %}
-                            <li class="nav-item dropdown">
+                        {% if user.profile.user_type == 'admin' %}                            <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="fas fa-home"></i>
                                     <span class="nav-text">Hostel</span>
                                 </a>
                                 <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'hostel_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'hostel_list' %}">All Hostels</a>
                                     <a class="dropdown-item" href="{% url 'room_list' %}">All Rooms</a>
                                     <a class="dropdown-item" href="{% url 'allocation_list' %}">Room Allocations</a>
@@ -145,13 +153,14 @@
                                     <a class="dropdown-item" href="{% url 'allocation_create' %}">Allocate Room</a>
                                 </div>
                             </li>
-                            
-                            <li class="nav-item dropdown">
+                              <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="fas fa-money-bill"></i>
                                     <span class="nav-text">Fees</span>
                                 </a>
                                 <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'fee_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'fee_category_list' %}">Fee Categories</a>
                                     <a class="dropdown-item" href="{% url 'fee_structure_list' %}">Fee Structure</a>
                                     <a class="dropdown-item" href="{% url 'payment_list' %}">Payments</a>
@@ -247,11 +256,11 @@
                                     <span>{{ user.username }}</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'profile' %}">My Profile</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'auth:profile' %}">My Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'auth:change_password' %}">Change Password</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+                                        <form id="logout-form" action="{% url 'auth:logout' %}" method="post" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="dropdown-item">Logout</button>
                                         </form>
@@ -289,9 +298,10 @@
     
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    <!-- Custom JavaScript -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    <!-- Custom JavaScript -->    <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/sidebar-dropdown-fix.js' %}"></script>
+    <script src="{% static 'js/sidebar-hover-expand.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
     {% if user.is_authenticated %}
     <script src="{% static 'js/notifications.js' %}"></script>
     {% endif %}

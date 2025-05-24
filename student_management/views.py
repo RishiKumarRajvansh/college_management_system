@@ -30,20 +30,34 @@ def student_list(request):
         search_query = form.cleaned_data.get('search_query')
         course_filter = form.cleaned_data.get('course')
         year_filter = form.cleaned_data.get('year')
-        
         if search_query:
-            students = students.filter(
-                Q(name__icontains=search_query) | 
-                Q(email__icontains=search_query) | 
-                Q(student_id__icontains=search_query)
-            )
+            # Try to parse the search query to handle formatted IDs like 'ST000001'
+            # Example: if user searches for 'ST000001', we'll search for student_id=1 as well
+            student_id_match = None
+            if search_query.upper().startswith('ST'):
+                try:
+                    # Extract the numeric part and convert to integer
+                    student_id_match = int(search_query[2:].lstrip('0')) if search_query[2:].lstrip('0') else 0
+                except ValueError:
+                    # If conversion fails, just continue with the normal search
+                    pass
+                    
+            # Build the query filter
+            query_filter = Q(name__icontains=search_query) | Q(email__icontains=search_query)
+            
+            # Add student_id filter if we found a match
+            if student_id_match is not None:
+                query_filter |= Q(student_id=student_id_match)
+            
+            # Apply the filter
+            students = students.filter(query_filter)
         
         if course_filter:
             students = students.filter(course=course_filter)
             
         if year_filter and year_filter != '0':  # '0' is 'All Years'
             students = students.filter(year=year_filter)
-      # Order students by ID to avoid UnorderedObjectListWarning
+        # Order students by ID to avoid UnorderedObjectListWarning
     students = students.order_by('student_id')
     
     # Paginate the results

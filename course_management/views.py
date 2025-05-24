@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from .models import Course
 from .forms import CourseForm, CourseSearchForm
 from user_authentication.models import UserProfile  # Added import
+from student_management.models import Student  # For enrollment counts
 
 # Helper function to check if user is admin
 def is_admin(user):
@@ -15,6 +16,40 @@ def is_admin(user):
         return (hasattr(user, 'profile') and user.profile.user_type == 'admin') or user.is_superuser
     except UserProfile.DoesNotExist:
         return False
+
+@login_required
+def dashboard(request):
+    """Dashboard view for Course Management module"""
+    # Get course statistics
+    total_courses = Course.objects.count()
+    active_courses = Course.objects.filter(is_active=True).count()
+    average_credits = Course.objects.aggregate(Avg('credits'))['credits__avg'] or 0
+    
+    # Find most popular course (course with most students)
+    # This assumes there's a many-to-many relationship between Student and Course
+    # or a direct reference from Student to Course
+    try:
+        courses_with_enrollment = Course.objects.annotate(
+            student_count=Count('student')
+        ).order_by('-student_count')
+        
+        popular_course = courses_with_enrollment.first() if courses_with_enrollment.exists() else None
+    except:
+        # If the relationship structure is different, handle gracefully
+        popular_course = None
+    
+    # Recently added courses
+    recent_courses = Course.objects.order_by('-created_at')[:5]
+    
+    context = {
+        'total_courses': total_courses,
+        'active_courses': active_courses,
+        'average_credits': average_credits,
+        'popular_course': popular_course,
+        'recent_courses': recent_courses
+    }
+    
+    return render(request, 'course_management/dashboard.html', context)
 
 @login_required
 def course_list(request):

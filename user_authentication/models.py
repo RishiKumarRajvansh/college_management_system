@@ -44,7 +44,39 @@ class AuditTrail(models.Model):
     description = models.TextField()
     
     def __str__(self):
-        return f"{self.user.username} - {self.action} - {self.module} - {self.action_time}"
+        return f"{self.user.username if self.user else 'Anonymous'} - {self.action} - {self.module} - {self.action_time}"
+
+    def get_action_display(self):
+        """Return the display value for the action field"""
+        return dict(self.ACTION_TYPES).get(self.action, self.action)
+        
+    def get_action_type_color(self):
+        """Return Bootstrap color class based on action type"""
+        color_map = {
+            'login': 'success',
+            'logout': 'secondary',
+            'create': 'primary',
+            'update': 'info',
+            'delete': 'danger',
+            'view': 'warning',
+        }
+        return color_map.get(self.action, 'primary')
+        
+    def get_action_icon(self):
+        """Return FontAwesome icon class based on action type"""
+        icon_map = {
+            'login': 'fas fa-sign-in-alt',
+            'logout': 'fas fa-sign-out-alt',
+            'create': 'fas fa-plus-circle',
+            'update': 'fas fa-edit',
+            'delete': 'fas fa-trash-alt',
+            'view': 'fas fa-eye',
+        }
+        return icon_map.get(self.action, 'fas fa-cog')
+        
+    def get_details_display(self):
+        """Return formatted details for display"""
+        return f"{self.module.title()}: {self.description}"
 
 class PasswordResetRequest(models.Model):
     STATUS_CHOICES = (

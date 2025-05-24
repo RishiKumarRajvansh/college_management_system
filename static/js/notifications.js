@@ -37,8 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dropdownContainer.appendChild(createLoadingSpinner());
             }
         }
-        
-        fetch('/api/notifications/')
+          fetch('/reporting/api/notifications/')
             .then(response => response.json())
             .then(data => {
                 // Remove loading indicator
@@ -128,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark a notification as read
     function markAsRead(notificationId) {
-        fetch(`/api/notifications/mark-read/${notificationId}/`, {
+        fetch(`/reporting/api/notifications/mark-read/${notificationId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -148,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark all notifications as read
     function markAllAsRead() {
-        fetch('/api/notifications/mark-read/', {
+        fetch('/reporting/api/notifications/mark-read/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

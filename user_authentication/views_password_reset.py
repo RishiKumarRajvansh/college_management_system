@@ -58,7 +58,7 @@ def request_password_reset(request):
                     "with a new temporary password. Please check with the admin."
                 )
             
-            return redirect('login')
+            return redirect('login')  # This is the project-level login URL
     else:
         form = PasswordResetRequestForm()
     
@@ -80,7 +80,7 @@ def process_reset_request(request, request_id):
     
     if reset_request.status != 'pending':
         messages.warning(request, f"This request has already been {reset_request.status}.")
-        return redirect('admin_reset_requests')
+        return redirect('auth:admin_reset_requests')
     
     if request.method == 'POST':
         form = AdminPasswordResetForm(request.POST, instance=reset_request)
@@ -127,13 +127,12 @@ def process_reset_request(request, request_id):
                     ip_address=request.META.get('REMOTE_ADDR'),
                     user_agent=request.META.get('HTTP_USER_AGENT')
                 )
-                
                 messages.info(request, f"Password reset request for {reset_request.user.username} has been rejected.")
             
             # Save the reset request after audit trail creation
             reset_request.save()
             
-            return redirect('admin_reset_requests')
+            return redirect('auth:admin_reset_requests')
     else:
         form = AdminPasswordResetForm(instance=reset_request)
     

@@ -69,7 +69,7 @@
                     <tbody>
                         {% for student in page_obj %}
                         <tr>
-                            <td>{{ student.student_id }}</td>
+                            <td>{{ student.formatted_id }}</td>
                             <td>{{ student.name }}</td>
                             <td>{{ student.email }}</td>
                             <td>{{ student.course.course_name }}</td>

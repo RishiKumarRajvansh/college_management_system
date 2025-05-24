@@ -3,52 +3,505 @@
 
 {% block title %}Fee Management Dashboard{% endblock %}
 
-{% block content %}
-<div class="container-fluid py-4">
-    <h1 class="mb-4">
-        <i class="fas fa-money-bill-wave text-primary me-2"></i>
-        Fee Management Dashboard
-    </h1>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: white;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
     
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-card .number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stats-card.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .stats-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stats-card.info { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+    .stats-card.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        height: 400px; /* Fixed consistent height */
+        position: relative;
+        overflow: hidden; /* Prevent content from spilling out */
+    }
+    
+    .recent-activity {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-dashboard {
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-dashboard:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Fee Management Dashboard</h1>
+        <div>
+            <a href="{% url 'payment_create' %}" class="btn btn-primary btn-dashboard mr-2">
+                <i class="fas fa-plus"></i> New Payment
+            </a>
+            <a href="{% url 'fee_structure_create' %}" class="btn btn-info btn-dashboard">
+                <i class="fas fa-plus"></i> New Fee Structure
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
     <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Fees Collected</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_fees_collected|floatformat:2 }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card success">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="number" id="totalCollected">${{ total_fees_collected|floatformat:2 }}</div>
+                        <div>Total Collected</div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="fas fa-dollar-sign fa-2x"></i>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Pending Payments</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_payments }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card warning">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="number">{{ pending_payments }}</div>
+                        <div>Pending Payments</div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="fas fa-clock fa-2x"></i>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card info">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="number">{{ fee_categories }}</div>
+                        <div>Fee Categories</div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="fas fa-tags fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card primary">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <div class="number">{{ fee_structures }}</div>
+                        <div>Fee Structures</div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="fas fa-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">        <!-- Payment Status Chart -->
+        <div class="col-xl-6 col-lg-6">
+        <div class="chart-container">
+                <h5 class="mb-3">Payment Status Distribution</h5>
+                <div style="position: relative; height: 280px; width: 100%;">
+                    <canvas id="paymentStatusChart"></canvas>
+                </div>
+                <div id="no-payment-data" class="text-center text-muted my-4" style="display: none;">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                    <p>No payment data available yet</p>
+                </div>
+            </div>
+        </div>
+          <!-- Monthly Collection Chart -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="chart-container">
+                <h5 class="mb-3">Monthly Fee Collection</h5>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="monthlyCollectionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Payment Methods Chart -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="chart-container">
+                <h5 class="mb-3">Payment Methods</h5>
+                <canvas id="paymentMethodsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Category Collection Chart -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="chart-container">
+                <h5 class="mb-3">Fee Collection by Category</h5>
+                <canvas id="categoryCollectionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="row">
+        <div class="col-12">
+            <div class="recent-activity">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Recent Payments</h5>
+                    <a href="{% url 'payment_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                </div>
+                
+                {% if recent_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Payment Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_payments %}
+                                <tr>
+                                    <td>{{ payment.student.name }}</td>
+                                    <td>{{ payment.fee_structure.category.name }}</td>
+                                    <td>${{ payment.amount }}</td>
+                                    <td>{{ payment.payment_date }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if payment.status == 'completed' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                            {{ payment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'payment_detail' payment.payment_id %}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent payments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5 class="mb-3">Quick Actions</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'fee_category_list' %}" class="btn btn-outline-primary btn-block btn-dashboard">
+                            <i class="fas fa-tags"></i> Manage Categories
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'fee_structure_list' %}" class="btn btn-outline-info btn-block btn-dashboard">
+                            <i class="fas fa-list"></i> Manage Structures
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'payment_list' %}" class="btn btn-outline-success btn-block btn-dashboard">
+                            <i class="fas fa-money-bill"></i> View Payments
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="#" onclick="generateReport()" class="btn btn-outline-warning btn-block btn-dashboard">
+                            <i class="fas fa-chart-bar"></i> Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+    
+    // Add window resize event listener to redraw charts on window resize
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            loadDashboardData();
+        }, 250);
+    });
+});
+
+function loadDashboardData() {
+    // Show loading indicators
+    const chartContainers = document.querySelectorAll('.chart-container');
+    chartContainers.forEach(container => {
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'text-center text-primary loading-indicator';
+        loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin fa-2x my-3"></i>';
+        
+        // Only add loading indicator if it doesn't already exist
+        if (!container.querySelector('.loading-indicator')) {
+            container.appendChild(loadingIndicator);
+        }
+    });
+    
+    fetch('{% url "fee_dashboard_data" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remove all loading indicators
+            document.querySelectorAll('.loading-indicator').forEach(el => el.remove());
+            
+            if (data.success) {
+                createCharts(data.data);
+            } else {
+                console.error('API returned error:', data.error);
+                showErrorMessage('Failed to load dashboard data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Remove all loading indicators
+            document.querySelectorAll('.loading-indicator').forEach(el => el.remove());
+            showErrorMessage('Failed to load dashboard data');
+        });
+}
+
+function showErrorMessage(message) {
+    const chartContainers = document.querySelectorAll('.chart-container');
+    chartContainers.forEach(container => {
+        const canvas = container.querySelector('canvas');
+        if (canvas) {
+            canvas.style.display = 'none';
+        }
+        
+        // Only add error message if it doesn't already exist
+        if (!container.querySelector('.error-message')) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-center text-danger my-5 error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle fa-2x mb-2"></i><p>${message}</p>`;
+            container.appendChild(errorDiv);
+        }
+    });
+}
+
+function createCharts(data) {    // Payment Status Chart
+    const noDataElement = document.getElementById('no-payment-data');
+    const paymentStatusValues = data.payment_status.map(item => item.count);
+    const hasPaymentData = paymentStatusValues.some(value => value > 0);
+    
+    if (!hasPaymentData) {
+        // Show the no-data message if all values are zero
+        if (noDataElement) {
+            noDataElement.style.display = 'block';
+        }
+    } else if (noDataElement) {
+        noDataElement.style.display = 'none';
+    }
+    
+    // Always render chart even with sample data
+    const statusCtx = document.getElementById('paymentStatusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: data.payment_status.map(item => item.status),
+            datasets: [{
+                data: data.payment_status.map(item => item.count),
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // Changed to false to fix height issues
+            cutout: '70%',  // Make doughnut hole larger
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        boxWidth: 12
+                    }
+                } 
+            }
+        }
+    });// Monthly Collection Chart
+    const monthlyCtx = document.getElementById('monthlyCollectionChart').getContext('2d');
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: data.monthly_collection.map(item => item.month),
+            datasets: [{
+                label: 'Collection Amount',
+                data: data.monthly_collection.map(item => item.amount),
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });    // Payment Methods Chart
+    const methodsCtx = document.getElementById('paymentMethodsChart').getContext('2d');
+    
+    if (data.payment_methods && data.payment_methods.length > 0) {
+        new Chart(methodsCtx, {
+            type: 'bar',
+            data: {
+                labels: data.payment_methods.map(item => item.method),
+                datasets: [{
+                    label: 'Number of Payments',
+                    data: data.payment_methods.map(item => item.count),
+                    backgroundColor: '#1cc88a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    y: { 
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        // Display message if no payment methods data
+        const methodsContainer = document.getElementById('paymentMethodsChart').parentNode;
+        const noMethodsData = document.createElement('div');
+        noMethodsData.className = 'text-center text-muted my-5 py-5';
+        noMethodsData.innerHTML = '<i class="fas fa-info-circle fa-2x mb-2"></i><p>No payment methods data available</p>';
+        methodsContainer.appendChild(noMethodsData);
+        methodsCtx.canvas.style.display = 'none';
+    }
+
+    // Category Collection Chart
+    const categoryCtx = document.getElementById('categoryCollectionChart').getContext('2d');
+    
+    if (data.category_collection && data.category_collection.length > 0) {
+        new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: data.category_collection.map(item => item.category),
+                datasets: [{
+                    data: data.category_collection.map(item => item.amount),
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            boxWidth: 12
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ₹' + context.parsed.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        // Display message if no category collection data
+        const categoryContainer = document.getElementById('categoryCollectionChart').parentNode;
+        const noCategoryData = document.createElement('div');
+        noCategoryData.className = 'text-center text-muted my-5 py-5';
+        noCategoryData.innerHTML = '<i class="fas fa-info-circle fa-2x mb-2"></i><p>No fee category data available</p>';
+        categoryContainer.appendChild(noCategoryData);
+        categoryCtx.canvas.style.display = 'none';
+    }
+}
+
+function generateReport() {
+    alert('Report generation feature will be implemented');
+}
+</script>
+{% endblock %}
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Fee Categories</div>
@@ -169,8 +622,7 @@
                                 {% else %}
                                     <tr>
                                         <td colspan="5" class="text-center">No payment records found.</td>
-                                    </tr>
-                                {% endif %}
+                                    </tr>                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -179,4 +631,3 @@
         </div>
     </div>
 </div>
-{% endblock %}

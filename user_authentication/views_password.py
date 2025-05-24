@@ -23,7 +23,7 @@ def change_password(request):
                 user.profile.save()
             
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('home')
+            return redirect('home')  # This is the project-level home URL
     else:
         form = PasswordChangingForm(request.user)
     
@@ -31,10 +31,9 @@ def change_password(request):
 
 @login_required
 def force_password_change(request):
-    """View to force password change on first login"""
-    # If user has already changed their password, redirect to home
+    """View to force password change on first login"""    # If user has already changed their password, redirect to home
     if not (hasattr(request.user, 'profile') and request.user.profile.is_first_login):
-        return redirect('home')
+        return redirect('home')  # This is the project-level home URL
         
     if request.method == 'POST':
         form = PasswordChangingForm(request.user, request.POST)
@@ -42,13 +41,12 @@ def force_password_change(request):
             user = form.save()
             # Keep the user logged in after password change
             update_session_auth_hash(request, user)
-            
-            # Update the first login flag
+              # Update the first login flag
             request.user.profile.is_first_login = False
             request.user.profile.save()
             
             messages.success(request, 'Your password has been changed successfully. Welcome!')
-            return redirect('home')
+            return redirect('home')  # This is the project-level home URL
     else:
         form = PasswordChangingForm(request.user)
     

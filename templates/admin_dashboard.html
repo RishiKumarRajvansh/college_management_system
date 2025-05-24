@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - College Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#systemStatusModal">
+            <i class="fas fa-server fa-sm text-white-50"></i> System Status
+        </a>
+    </div>
+
+    <!-- Content Row - Quick Stats -->
+    <div class="row">
+        <!-- Students Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Students</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ student_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'student_list' %}" class="small text-primary">View Details &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Faculty</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ faculty_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'faculty_list' %}" class="small text-success">View Details &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ course_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'course_dashboard' %}" class="small text-info">View Details &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Reports</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ report_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'reporting_dashboard' %}" class="small text-warning">View Details &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row - Module Cards -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <!-- Attendance Management Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Attendance Management</h6>
+                    <a href="{% url 'attendance_dashboard' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3 text-center">
+                            <i class="fas fa-clipboard-check fa-3x text-gray-300 mb-2"></i>
+                        </div>
+                        <div class="col-9">
+                            <h4 class="small font-weight-bold">Today's Attendance <span class="float-right">{{ today_attendance_percentage }}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ today_attendance_percentage }}%" 
+                                    aria-valuenow="{{ today_attendance_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p>
+                                <span class="badge bg-success text-white">{{ present_count }} Present</span>
+                                <span class="badge bg-danger text-white">{{ absent_count }} Absent</span>
+                                <span class="badge bg-warning text-white">{{ late_count }} Late</span>
+                                <span class="badge bg-info text-white">{{ excused_count }} Excused</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'record_attendance' %}" class="btn btn-sm btn-block btn-primary">
+                                <i class="fas fa-plus-circle mr-1"></i> Record Attendance
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'attendance_report' %}" class="btn btn-sm btn-block btn-secondary">
+                                <i class="fas fa-file-alt mr-1"></i> Generate Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <!-- Examination Management Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Examination Management</h6>
+                    <a href="{% url 'examination_dashboard' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-3 text-center">
+                            <i class="fas fa-file-signature fa-3x text-gray-300 mb-2"></i>
+                        </div>
+                        <div class="col-9">
+                            <h4 class="small font-weight-bold">Average Performance <span class="float-right">{{ average_score }}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ average_score }}%" 
+                                    aria-valuenow="{{ average_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p>
+                                <strong>Upcoming Exams:</strong> {{ upcoming_exam_count }}
+                                <br>
+                                <strong>Results Pending:</strong> {{ results_pending_count }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'schedule_exam' %}" class="btn btn-sm btn-block btn-primary">
+                                <i class="fas fa-calendar-plus mr-1"></i> Schedule Exam
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'record_results' %}" class="btn btn-sm btn-block btn-secondary">
+                                <i class="fas fa-edit mr-1"></i> Record Results
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <!-- Library Management Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Library Management</h6>
+                    <a href="{% url 'library_dashboard' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Books</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ book_count }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Books Borrowed</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ borrowed_books }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-book-reader fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Recent Activity:</strong> {{ recent_book_issues }} new issues this week
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'add_book' %}" class="btn btn-sm btn-block btn-primary">
+                                <i class="fas fa-plus-circle mr-1"></i> Add Book
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'issue_book' %}" class="btn btn-sm btn-block btn-secondary">
+                                <i class="fas fa-hand-holding mr-1"></i> Issue Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <!-- Hostel Management Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Hostel Management</h6>
+                    <a href="{% url 'hostel_dashboard' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Hostels</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ hostel_count }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Rooms</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ room_count }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-door-open fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Occupied</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ occupied_rooms }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-home fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Recent Activity:</strong> {{ recent_room_allocations }} new allocations this week
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'allocate_room' %}" class="btn btn-sm btn-block btn-primary">
+                                <i class="fas fa-key mr-1"></i> Allocate Room
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'hostel_report' %}" class="btn btn-sm btn-block btn-secondary">
+                                <i class="fas fa-file-alt mr-1"></i> Hostel Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <!-- Fee Management Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Fee Management</h6>
+                    <a href="{% url 'fee_dashboard' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Fees Collected</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">₹{{ total_fees_collected }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-rupee-sign fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Payments</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_payments }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Recent Activity:</strong> {{ recent_payments }} new payments this week
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'payment_add' %}" class="btn btn-sm btn-block btn-primary">
+                                <i class="fas fa-money-bill-wave mr-1"></i> Record Payment
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'fee_report' %}" class="btn btn-sm btn-block btn-secondary">
+                                <i class="fas fa-file-invoice-dollar mr-1"></i> Fee Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <!-- Recent Activities Card -->            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">System-wide Activities</h6>
+                    <div>
+                        <span class="badge bg-info mr-2">Admin View - All Activities</span>
+                        <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-sm btn-outline-primary">View Full Log</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="activity-stream">
+                        {% for activity in recent_activities %}
+                        <div class="activity-item border-left-{{ activity.get_action_type_color }} shadow-sm mb-3 p-3">
+                            <div class="d-flex justify-content-between">                                <div>
+                                    <i class="{{ activity.get_action_icon }} mr-2"></i>
+                                    <strong>{{ activity.user.username|default:"System" }}</strong> {{ activity.description }}
+                                </div>
+                                <small class="text-muted">{{ activity.action_time|timesince }} ago</small>
+                            </div>
+                            <div class="text-muted small mt-1">{{ activity.get_details_display }}</div>
+                        </div>
+                        {% empty %}
+                        <p>No recent activity to display.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'auth:system_activity_logs' %}">View All Activities</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status Modal -->
+<div class="modal fade" id="systemStatusModal" tabindex="-1" aria-labelledby="systemStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="systemStatusModalLabel">System Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="font-weight-bold">Module Status</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Student Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Faculty Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Course Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Attendance Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Examination Module</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Library Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Hostel Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Fee Management</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                        <tr>
+                            <td>Reporting Module</td>
+                            <td><span class="badge badge-success">Operational</span></td>
+                            <td>{{ now }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h6 class="font-weight-bold mt-4">System Information</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Application Version</th>
+                                <td>{{ app_version }}</td>
+                            </tr>
+                            <tr>
+                                <th>Django Version</th>
+                                <td>{{ django_version }}</td>
+                            </tr>
+                            <tr>
+                                <th>Database</th>
+                                <td>{{ database_info }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Server Uptime</th>
+                                <td>{{ server_uptime }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Backup</th>
+                                <td>{{ last_backup }}</td>
+                            </tr>
+                            <tr>
+                                <th>System Load</th>
+                                <td>{{ system_load }}%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

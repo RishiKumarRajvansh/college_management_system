@@ -31,8 +31,7 @@ class ForcePasswordChangeMiddleware:
             # Exempt URLs and admin users
             if any(m.match(full_path) for m in self.exempt_urls) or request.user.is_superuser:
                 return self.get_response(request)
-            
-            # Redirect to force password change
-            return redirect('force_password_change')
+              # Redirect to force password change
+            return redirect('auth:force_password_change')
             
         return self.get_response(request)

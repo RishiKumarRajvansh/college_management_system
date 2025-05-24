@@ -12,6 +12,16 @@ class StudentForm(forms.ModelForm):
             'course': forms.Select(attrs={'class': 'form-control'}),
             'year': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 5}),
         }
+        
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        instance = getattr(self, 'instance', None)
+        
+        # Check if this email already exists
+        if Student.objects.filter(email=email).exclude(pk=instance.pk if instance and instance.pk else None).exists():
+            raise forms.ValidationError("A student with this email already exists.")
+        
+        return email
 
 class StudentSearchForm(forms.Form):
     search_query = forms.CharField(

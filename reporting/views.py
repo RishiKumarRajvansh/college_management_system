@@ -51,13 +51,11 @@ def dashboard(request):
     for item in report_counts:
         report_type = report_types_dict.get(item['report_type'], item['report_type'])
         report_types.append(report_type)
-        report_counts_values.append(item['count'])
-    
-    # Get recent reports
+        report_counts_values.append(item['count'])    # Get recent reports
     recent_reports = Report.objects.all().order_by('-generation_date')[:5]
     
     # Get scheduled reports
-    scheduled_reports = Report.objects.filter(is_scheduled=True).order_by('next_run')[:5]
+    scheduled_reports = Report.objects.filter(is_scheduled=True).order_by('last_run')[:5]
     
     # Get system-wide statistics for the dashboard
     total_students = Student.objects.count()

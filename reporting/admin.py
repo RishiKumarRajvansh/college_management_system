@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Report, Notification
+from .models import Report, Notification, DatabaseBackup
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
@@ -16,3 +16,19 @@ class NotificationAdmin(admin.ModelAdmin):
     search_fields = ('message', 'user__username')
     date_hierarchy = 'created_at'
     readonly_fields = ('created_at', 'read_at')
+
+@admin.register(DatabaseBackup)
+class DatabaseBackupAdmin(admin.ModelAdmin):
+    list_display = ('backup_id', 'backup_date', 'backup_size', 'is_automatic', 'status', 'created_by')
+    list_filter = ('backup_date', 'is_automatic', 'status')
+    search_fields = ('backup_file', 'notes')
+    date_hierarchy = 'backup_date'
+    readonly_fields = ('backup_id', 'backup_date')
+    fieldsets = (
+        ('Backup Information', {
+            'fields': ('backup_file', 'backup_date', 'backup_size', 'status')
+        }),
+        ('Additional Details', {
+            'fields': ('created_by', 'is_automatic', 'notes')
+        }),
+    )

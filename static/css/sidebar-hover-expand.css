@@ -1,0 +1,40 @@
+/* sidebar-hover-expand.css - Styles for sidebar hover expansion */
+#sidebar-wrapper {
+    transition: width 0.3s ease;
+}
+
+#content-wrapper {
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Additional styles for hover state */
+#sidebar-wrapper.hover-expanded {
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 1050; /* Ensure it appears above other elements */
+}
+
+/* When sidebar is collapsed, only show icons */
+#sidebar-wrapper.collapsed .nav-text,
+#sidebar-wrapper.collapsed .sidebar-brand-text,
+#sidebar-wrapper.collapsed .sidebar-heading,
+#sidebar-wrapper.collapsed .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* When sidebar is hovered, show text again */
+#sidebar-wrapper.hover-expanded .nav-text,
+#sidebar-wrapper.hover-expanded .sidebar-brand-text,
+#sidebar-wrapper.hover-expanded .sidebar-heading {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s 0.1s, visibility 0.3s 0.1s;
+}
+
+@media (max-width: 768px) {
+    /* Disable hover expansion on mobile devices */
+    #sidebar-wrapper.hover-expanded {
+        width: 280px;
+    }
+}

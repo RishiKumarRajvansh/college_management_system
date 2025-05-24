@@ -3,210 +3,333 @@
 
 {% block title %}Hostel Management Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .gradient-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .gradient-card-success {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+    
+    .gradient-card-warning {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
+    
+    .gradient-card-info {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #333;
+    }
+    
+    .metric-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin-bottom: 20px;
+    }
+    
+    .quick-stats {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .action-btn {
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
-    <h1 class="mb-4">
-        <i class="fas fa-building text-primary me-2"></i>
-        Hostel Management Dashboard
-    </h1>
-    
-    <!-- Summary Cards -->
+    <!-- Header Section -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Hostels</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_hostels }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-building fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-building text-primary me-2"></i>
+                        Hostel Management Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">Monitor hostel operations, room allocations, and occupancy rates</p>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Rooms</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_rooms }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-door-open fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Available Rooms</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ available_rooms }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Current Allocations</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_allocations }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+                <div>
+                    <button class="btn btn-primary action-btn" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="row">
-        <!-- Hostel Occupancy Chart -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Hostel Occupancy Rates</h6>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading dashboard data...</p>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4" id="metricsSection">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card metric-card gradient-card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-building fa-3x opacity-75"></i>
+                    </div>
+                    <h2 class="mb-1" id="totalHostels">--</h2>
+                    <p class="mb-0">Total Hostels</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card metric-card gradient-card-success h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-door-open fa-3x opacity-75"></i>
+                    </div>
+                    <h2 class="mb-1" id="totalRooms">--</h2>
+                    <p class="mb-0">Total Rooms</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card metric-card gradient-card-warning h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-users fa-3x opacity-75"></i>
+                    </div>
+                    <h2 class="mb-1" id="currentAllocations">--</h2>
+                    <p class="mb-0">Current Allocations</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card metric-card gradient-card-info h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-percentage fa-3x opacity-75"></i>
+                    </div>
+                    <h2 class="mb-1" id="occupancyRate">--%</h2>
+                    <p class="mb-0">Occupancy Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row mb-4">
+        <!-- Room Status Distribution -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Room Status Distribution
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="chart-bar">
+                    <div class="chart-container">
+                        <canvas id="roomStatusChart"></canvas>
+                    </div>
+                    <div class="row text-center mt-3">
+                        <div class="col-4">
+                            <div class="p-2">
+                                <i class="fas fa-circle text-success"></i>
+                                <small class="d-block">Available</small>
+                                <strong id="availableRooms">--</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2">
+                                <i class="fas fa-circle text-danger"></i>
+                                <small class="d-block">Occupied</small>
+                                <strong id="occupiedRooms">--</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2">
+                                <i class="fas fa-circle text-warning"></i>
+                                <small class="d-block">Maintenance</small>
+                                <strong id="maintenanceRooms">--</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hostel Occupancy Rates -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Hostel Occupancy Rates
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
                         <canvas id="hostelOccupancyChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Room Status Doughnut Chart -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Room Status Distribution</h6>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row mb-4">
+        <!-- Monthly Allocation Trends -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Monthly Allocation Trends
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="roomStatusChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="monthlyAllocationsChart"></canvas>
                     </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Available
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-danger"></i> Occupied
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> Maintenance
-                        </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Capacity Utilization -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Capacity Utilization
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="capacityChart"></canvas>
+                    </div>
+                    <div class="text-center mt-3">
+                        <p class="mb-1">Overall Utilization</p>
+                        <h4 id="overallUtilization" class="text-primary">--%</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Recent Allocations Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Hostel Allocations</h6>
-                    <a href="{% url 'allocation_list' %}" class="btn btn-sm btn-primary">
-                        View All <i class="fas fa-arrow-right ml-1"></i>
+
+    <!-- Recent Activities and Quick Actions -->
+    <div class="row mb-4">
+        <!-- Recent Allocations -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>Recent Allocations
+                    </h5>
+                    <a href="{% url 'allocation_list' %}" class="btn btn-light btn-sm">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Student</th>
                                     <th>Hostel</th>
                                     <th>Room</th>
-                                    <th>Allocation Date</th>
+                                    <th>Date</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% for allocation in recent_allocations %}
+                            <tbody id="recentAllocationsTable">
                                 <tr>
-                                    <td>{{ allocation.student.name }}</td>
-                                    <td>{{ allocation.room.hostel.hostel_name }}</td>
-                                    <td>{{ allocation.room.room_number }}</td>
-                                    <td>{{ allocation.allocation_date }}</td>
-                                    <td>
-                                        {% if allocation.is_active %}
-                                        <span class="badge bg-success">Active</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">Inactive</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'allocation_detail' allocation.allocation_id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                        <span class="ms-2">Loading recent allocations...</span>
                                     </td>
                                 </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No recent allocations found.</td>
-                                </tr>
-                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Quick Actions Row -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+        
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row justify-content-center">
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'hostel_create' %}" class="btn btn-primary btn-block">
-                                <i class="fas fa-plus-circle mr-1"></i> New Hostel
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'room_create' %}" class="btn btn-success btn-block">
-                                <i class="fas fa-plus-circle mr-1"></i> New Room
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'allocation_create' %}" class="btn btn-info btn-block">
-                                <i class="fas fa-user-plus mr-1"></i> Allocate Room
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'hostel_list' %}" class="btn btn-secondary btn-block">
-                                <i class="fas fa-list mr-1"></i> View All Hostels
-                            </a>
-                        </div>
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'hostel_create' %}" class="btn btn-primary action-btn">
+                            <i class="fas fa-plus-circle me-2"></i>Add New Hostel
+                        </a>
+                        <a href="{% url 'room_create' %}" class="btn btn-success action-btn">
+                            <i class="fas fa-door-open me-2"></i>Add New Room
+                        </a>
+                        <a href="{% url 'allocation_create' %}" class="btn btn-info action-btn">
+                            <i class="fas fa-user-plus me-2"></i>Allocate Room
+                        </a>
+                        <a href="{% url 'hostel_list' %}" class="btn btn-secondary action-btn">
+                            <i class="fas fa-list me-2"></i>View All Hostels
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Statistics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="quick-stats">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <h4 id="avgOccupancy">--%</h4>
+                        <small>Average Occupancy</small>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <h4 id="vacantRooms">--</h4>
+                        <small>Vacant Rooms</small>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <h4 id="totalCapacity">--</h4>
+                        <small>Total Capacity</small>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 id="monthlyAllocations">--</h4>
+                        <small>This Month's Allocations</small>
                     </div>
                 </div>
             </div>
@@ -218,21 +341,115 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Hostel Occupancy Bar Chart
-    var ctx = document.getElementById('hostelOccupancyChart').getContext('2d');
-    var myBarChart = new Chart(ctx, {
-        type: 'bar',
+let dashboardCharts = {};
+
+// Dashboard initialization
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+function loadDashboardData() {
+    showLoading(true);
+    
+    fetch('{% url "hostel_dashboard_data" %}')
+        .then(response => response.json())
+        .then(data => {
+            updateMetrics(data);
+            createCharts(data);
+            updateRecentAllocations(data.recent_allocations);
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            showError('Failed to load dashboard data');
+            showLoading(false);
+        });
+}
+
+function updateMetrics(data) {
+    document.getElementById('totalHostels').textContent = data.total_hostels;
+    document.getElementById('totalRooms').textContent = data.total_rooms;
+    document.getElementById('currentAllocations').textContent = data.current_allocations;
+    document.getElementById('occupancyRate').textContent = data.occupancy_rate + '%';
+    
+    // Update room status counts
+    document.getElementById('availableRooms').textContent = data.room_status.available;
+    document.getElementById('occupiedRooms').textContent = data.room_status.occupied;
+    document.getElementById('maintenanceRooms').textContent = data.room_status.maintenance;
+    
+    // Update quick statistics
+    document.getElementById('avgOccupancy').textContent = data.average_occupancy + '%';
+    document.getElementById('vacantRooms').textContent = data.vacant_rooms;
+    document.getElementById('totalCapacity').textContent = data.total_capacity;
+    document.getElementById('monthlyAllocations').textContent = data.monthly_allocations;
+    document.getElementById('overallUtilization').textContent = data.overall_utilization + '%';
+}
+
+function createCharts(data) {
+    // Room Status Distribution Chart
+    const roomStatusCtx = document.getElementById('roomStatusChart').getContext('2d');
+    if (dashboardCharts.roomStatus) {
+        dashboardCharts.roomStatus.destroy();
+    }
+    dashboardCharts.roomStatus = new Chart(roomStatusCtx, {
+        type: 'doughnut',
         data: {
-            labels: [{% for hostel in hostel_data %}'{{ hostel.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            labels: ['Available', 'Occupied', 'Maintenance'],
             datasets: [{
-                label: 'Occupancy Rate (%)',
-                data: [{% for hostel in hostel_data %}{{ hostel.occupancy_rate|floatformat:1 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                backgroundColor: 'rgba(78, 115, 223, 0.8)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                borderWidth: 1
+                data: [
+                    data.room_status.available,
+                    data.room_status.occupied,
+                    data.room_status.maintenance
+                ],
+                backgroundColor: [
+                    '#28a745',
+                    '#dc3545',
+                    '#ffc107'
+                ],
+                borderWidth: 3,
+                borderColor: '#fff'
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Hostel Occupancy Chart
+    const hostelOccupancyCtx = document.getElementById('hostelOccupancyChart').getContext('2d');
+    if (dashboardCharts.hostelOccupancy) {
+        dashboardCharts.hostelOccupancy.destroy();
+    }
+    dashboardCharts.hostelOccupancy = new Chart(hostelOccupancyCtx, {
+        type: 'bar',
+        data: {
+            labels: data.hostel_occupancy.map(item => item.name),
+            datasets: [{
+                label: 'Occupancy Rate (%)',
+                data: data.hostel_occupancy.map(item => item.occupancy_rate),
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
             maintainAspectRatio: false,
             scales: {
                 y: {
@@ -240,44 +457,180 @@
                     max: 100,
                     ticks: {
                         callback: function(value) {
-                            return value + '%'
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Monthly Allocations Trend Chart
+    const monthlyAllocationsCtx = document.getElementById('monthlyAllocationsChart').getContext('2d');
+    if (dashboardCharts.monthlyAllocations) {
+        dashboardCharts.monthlyAllocations.destroy();
+    }
+    dashboardCharts.monthlyAllocations = new Chart(monthlyAllocationsCtx, {
+        type: 'line',
+        data: {
+            labels: data.monthly_trends.map(item => item.month),
+            datasets: [{
+                label: 'New Allocations',
+                data: data.monthly_trends.map(item => item.allocations),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Capacity Utilization Chart
+    const capacityCtx = document.getElementById('capacityChart').getContext('2d');
+    if (dashboardCharts.capacity) {
+        dashboardCharts.capacity.destroy();
+    }
+    dashboardCharts.capacity = new Chart(capacityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Utilized', 'Available'],
+            datasets: [{
+                data: [
+                    data.capacity_utilization.utilized,
+                    data.capacity_utilization.available
+                ],
+                backgroundColor: [
+                    '#17a2b8',
+                    '#e9ecef'
+                ],
+                borderWidth: 3,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
                         }
                     }
                 }
             }
         }
     });
+}
+
+function updateRecentAllocations(allocations) {
+    const tbody = document.getElementById('recentAllocationsTable');
+    tbody.innerHTML = '';
     
-    // Room Status Doughnut Chart
-    var ctx2 = document.getElementById('roomStatusChart').getContext('2d');
-    var myPieChart = new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Available', 'Occupied', 'Maintenance'],
-            datasets: [{
-                data: [{{ available_rooms }}, {{ occupied_rooms }}, {{ total_rooms }} - {{ available_rooms }} - {{ occupied_rooms }}],
-                backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
-                hoverBackgroundColor: ['#17a673', '#c93325', '#dda20a'],
-                hoverBorderColor: 'rgba(234, 236, 244, 1)',
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-            },
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 80,
-        },
+    if (allocations.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <br>No recent allocations found
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    allocations.forEach(allocation => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="avatar bg-primary text-white rounded-circle me-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        ${allocation.student_name.charAt(0).toUpperCase()}
+                    </div>
+                    <span>${allocation.student_name}</span>
+                </div>
+            </td>
+            <td>${allocation.hostel_name}</td>
+            <td>
+                <span class="badge bg-secondary">${allocation.room_number}</span>
+            </td>
+            <td>${new Date(allocation.allocation_date).toLocaleDateString()}</td>
+            <td>
+                <span class="badge ${allocation.is_active ? 'bg-success' : 'bg-secondary'}">
+                    ${allocation.is_active ? 'Active' : 'Inactive'}
+                </span>
+            </td>
+        `;
+        tbody.appendChild(row);
     });
+}
+
+function showLoading(show) {
+    const loading = document.getElementById('loadingIndicator');
+    const content = document.getElementById('metricsSection');
+    
+    if (show) {
+        loading.style.display = 'block';
+        content.style.opacity = '0.6';
+    } else {
+        loading.style.display = 'none';
+        content.style.opacity = '1';
+    }
+}
+
+function showError(message) {
+    // Create a toast notification for errors
+    const toast = document.createElement('div');
+    toast.className = 'toast position-fixed top-0 end-0 m-3';
+    toast.innerHTML = `
+        <div class="toast-header bg-danger text-white">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">${message}</div>
+    `;
+    document.body.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove toast element after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+function refreshDashboard() {
+    loadDashboardData();
+}
+
+// Auto-refresh dashboard every 5 minutes
+setInterval(loadDashboardData, 300000);
 </script>
 {% endblock %}

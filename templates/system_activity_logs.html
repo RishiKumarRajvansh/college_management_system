@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Activity Logs | College Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">System Activity Logs</h1>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>    <!-- Filters Card -->
+    <div class="card mb-4 shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Activities</h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{% url 'auth:system_activity_logs' %}" class="form-inline">
+                <div class="row w-100">
+                    <div class="col-md-3 mb-2">
+                        <label for="module" class="mr-2">Module:</label>
+                        <select name="module" id="module" class="form-control w-100">
+                            <option value="">All Modules</option>
+                            {% for module in available_modules %}
+                                <option value="{{ module }}" {% if selected_module == module %}selected{% endif %}>
+                                    {{ module|title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>                    <div class="col-md-2 mb-2">
+                        <label for="action" class="mr-2">Action:</label>
+                        <select name="action" id="action" class="form-control w-100">
+                            <option value="">All Actions</option>
+                            {% for action_value, action_label in available_actions %}
+                                <option value="{{ action_value }}" {% if selected_action == action_value %}selected{% endif %}>
+                                    {{ action_label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>                <div class="col-md-2 mb-3">
+                    <label for="user_filter">User</label>
+                    <select name="user_filter" id="user_filter" class="form-control w-100">
+                        <option value="">All Users</option>
+                        {% for user_obj in available_users %}
+                            <option value="{{ user_obj.id }}" {% if selected_user|stringformat:"i" == user_obj.id|stringformat:"i" %}selected{% endif %}>{{ user_obj.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="date_from">From Date</label>
+                    <input type="date" name="date_from" id="date_from" class="form-control w-100" value="{{ date_from|date:'Y-m-d' }}">
+                </div>                <div class="col-md-2 mb-3">
+                    <label for="date_to">To Date</label>
+                    <input type="date" name="date_to" id="date_to" class="form-control w-100" value="{{ date_to|date:'Y-m-d' }}">
+                </div>                <div class="col-md-3 mb-3">
+                    <label for="search">Search Description</label>
+                    <input type="text" name="search" id="search" class="form-control w-100" value="{{ search_query }}" placeholder="Search in description...">
+                </div>
+                <div class="col-md-12 d-flex justify-content-between mt-2">
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        {% if request.GET %}
+                        <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-secondary ml-2">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <button type="submit" name="export" value="csv" class="btn btn-success">
+                            <i class="fas fa-file-csv"></i> Export to CSV
+                        </button>
+                    </div>
+                </div>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                    {% if request.GET %}
+                    <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Activity Logs Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="m-0 font-weight-bold text-primary">Activity Log Entries</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable">                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Module</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.action_time }}</td>
+                            <td>{{ activity.user.username|default:"Anonymous" }}</td>
+                            <td>{{ activity.module|title }}</td>
+                            <td>
+                                <span class="badge {% if activity.action == 'create' %}bg-success{% elif activity.action == 'update' %}bg-primary{% elif activity.action == 'delete' %}bg-danger{% else %}bg-info{% endif %}">
+                                    {{ activity.get_action_display }}
+                                </span>
+                            </td>
+                            <td>{{ activity.description }}</td>
+                            <td>{{ activity.ip_address|default:"N/A" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No activity logs found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            {% if activities.has_other_pages %}
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if activities.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ activities.previous_page_number }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in activities.paginator.page_range %}
+                        {% if activities.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ num }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if activities.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ activities.next_page_number }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

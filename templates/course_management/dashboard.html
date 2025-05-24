@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Course Management Dashboard - College Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Course Management Dashboard</h1>
+        {% if user.is_superuser or user.profile.user_type == 'admin' or user.profile.user_type == 'faculty' %}
+        <a href="{% url 'course_add' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Add New Course
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Content Row - Course Statistics -->
+    <div class="row">
+        <!-- Total Courses -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Courses -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Credits -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Average Credits</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ average_credits|floatformat:1 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course with Most Students -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Most Popular Course</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ popular_course.name|default:"N/A" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row - Course Charts -->
+    <div class="row">
+        <!-- Course Distribution by Credits Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Course Distribution by Credits</h6>
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="courseCreditCanvas" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="courseCreditCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Enrollment by Course Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Top 5 Courses by Enrollment</h6>
+                    <button class="btn btn-sm btn-link refresh-chart" data-chart="courseEnrollmentCanvas" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="courseEnrollmentCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row - Recent Courses and Quick Actions -->
+    <div class="row">
+        <!-- Recently Added Courses -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recently Added Courses</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Credits</th>
+                                    <th>Faculty</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in recent_courses %}
+                                <tr>
+                                    <td>{{ course.code }}</td>
+                                    <td>{{ course.name }}</td>
+                                    <td>{{ course.credits }}</td>
+                                    <td>{{ course.faculty.name|default:"Not Assigned" }}</td>
+                                    <td>
+                                        <a href="{% url 'course_detail' course.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if user.is_superuser or user.profile.user_type == 'admin' %}
+                                        <a href="{% url 'course_edit' course.id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'course_delete' course.id %}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No courses added yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'course_list' %}" class="btn btn-primary">View All Courses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions and Tips -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'course_add' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle mr-2"></i> Add New Course
+                        </a>
+                        <a href="{% url 'course_list' %}?search_query=active" class="list-group-item list-group-item-action">
+                            <i class="fas fa-check-circle mr-2"></i> View Active Courses
+                        </a>
+                        {% if user.is_superuser or user.profile.user_type == 'admin' %}
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-file-export mr-2"></i> Export Course List
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-bar mr-2"></i> Course Analytics
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Management Tips -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tips & Reminders</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">
+                        <h6><i class="fas fa-lightbulb mr-2"></i>Did You Know?</h6>
+                        <p class="mb-0">Regularly updating course descriptions can improve student enrollment rates by up to 25%.</p>
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <h6><i class="fas fa-exclamation-triangle mr-2"></i>Reminder</h6>
+                        <p class="mb-0">Course schedules for the next semester should be finalized by next week.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load course credit distribution chart
+        fetch('/api/course-credit-distribution/')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('courseCreditCanvas').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(78, 115, 223, 0.7)',
+                                'rgba(54, 185, 204, 0.7)',
+                                'rgba(28, 200, 138, 0.7)',
+                                'rgba(246, 194, 62, 0.7)',
+                                'rgba(231, 74, 59, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(78, 115, 223)',
+                                'rgb(54, 185, 204)',
+                                'rgb(28, 200, 138)',
+                                'rgb(246, 194, 62)',
+                                'rgb(231, 74, 59)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Course Distribution by Credits'
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+            });
+
+        // Load course enrollment chart
+        fetch('/api/course-enrollment/')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('courseEnrollmentCanvas').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Number of Students',
+                            data: data.data,
+                            backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                            borderColor: 'rgb(78, 115, 223)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Students'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Top 5 Courses by Student Enrollment'
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}

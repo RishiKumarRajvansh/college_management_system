@@ -12,4 +12,15 @@ class Student(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} ({self.student_id})"
+        return f"{self.name} ({self.formatted_id})"
+
+    @property
+    def formatted_id(self):
+        """Return the student ID formatted as ST000001, ST000002, etc.
+        
+        Note: This is for display purposes only. The actual student_id field
+        remains an integer (AutoField) in the database. This property allows us
+        to show student IDs in a consistent format throughout the application
+        while maintaining database integrity with proper data types.
+        """
+        return f"ST{self.student_id:06d}"

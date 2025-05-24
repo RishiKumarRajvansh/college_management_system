@@ -11,8 +11,12 @@
         max-height: 500px;
     }
       @media (max-width: 768px) {
-        .chart-container {
-            height: 200px;
+        .chart-container {                                <tr>
+                                    <th>Report Name</th>
+                                    <th>Frequency</th>
+                                    <th>Last Run</th>
+                                    <th>Actions</th>
+                                </tr>height: 200px;
             min-height: 180px;
         }
         .mobile-mb-4 {
@@ -353,11 +357,10 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
+                            <thead>                                <tr>
                                     <th>Title</th>
                                     <th>Frequency</th>
-                                    <th>Next Run</th>
+                                    <th>Last Run</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -365,12 +368,11 @@
                                 {% for report in scheduled_reports %}
                                 <tr>
                                     <td>{{ report.title }}</td>
-                                    <td>{{ report.schedule_frequency }}</td>
-                                    <td>
-                                        {% if report.next_run %}
-                                        {{ report.next_run|date:"M d, Y" }}
+                                    <td>{{ report.schedule_frequency|default:"Not set" }}</td>                                    <td>
+                                        {% if report.last_run %}
+                                        {{ report.last_run|date:"M d, Y" }} (Last run)
                                         {% else %}
-                                        <span class="text-muted">Not scheduled</span>
+                                        <span class="text-muted">Never run</span>
                                         {% endif %}
                                     </td>
                                     <td>

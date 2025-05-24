@@ -380,3 +380,39 @@ def student_hostel_history(request, student_id):
     }
     
     return render(request, 'hostel_management/student_hostel_history.html', context)
+
+@login_required
+def hostel_report(request):
+    """View for generating and displaying hostel occupancy and allocation reports"""
+    hostels = Hostel.objects.all().annotate(
+        total_rooms=Count('rooms'),
+        occupied_rooms=Count('rooms', filter=Q(rooms__status='occupied')),
+        available_rooms=Count('rooms', filter=Q(rooms__status='available')),
+        maintenance_rooms=Count('rooms', filter=Q(rooms__status='maintenance'))
+    )
+    
+    # Get overall statistics
+    total_rooms = Room.objects.count()
+    occupied_rooms = Room.objects.filter(status='occupied').count()
+    available_rooms = Room.objects.filter(status='available').count()
+    maintenance_rooms = Room.objects.filter(status='maintenance').count()
+    
+    # Calculate occupancy rate
+    occupancy_rate = (occupied_rooms / total_rooms * 100) if total_rooms > 0 else 0
+    
+    # Get recent allocations
+    recent_allocations = HostelAllocation.objects.filter(
+        is_active=True
+    ).order_by('-allocation_date')[:10]
+    
+    context = {
+        'hostels': hostels,
+        'total_rooms': total_rooms,
+        'occupied_rooms': occupied_rooms,
+        'available_rooms': available_rooms,
+        'maintenance_rooms': maintenance_rooms,
+        'occupancy_rate': occupancy_rate,
+        'recent_allocations': recent_allocations,
+    }
+    
+    return render(request, 'hostel_management/hostel_report.html', context)

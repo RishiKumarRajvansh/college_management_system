@@ -6,6 +6,9 @@ from .forms import LoginForm, PasswordChangingForm
 from .views_auth import CustomLoginView
 from .views_password import force_password_change
 from .views_password_reset import request_password_reset, admin_reset_requests, process_reset_request
+from .views_activity import system_activity_logs
+
+app_name = 'auth'
 
 urlpatterns = [
     # Login view is now handled at the project level
@@ -22,9 +25,11 @@ urlpatterns = [
     ), name='change_password'),
     path('password-changed/', auth_views.PasswordChangeDoneView.as_view(
         template_name='user_authentication/password_changed.html'
-    ), name='password_changed'),
-    # Custom password reset paths
-    path('password-reset/', request_password_reset, name='password_reset'),    path('admin-reset-requests/', admin_reset_requests, name='admin_reset_requests'),
+    ), name='password_changed'),    # Custom password reset paths
+    path('password-reset/', request_password_reset, name='password_reset'),
+    path('admin-reset-requests/', admin_reset_requests, name='admin_reset_requests'),
     path('process-reset-request/<uuid:request_id>/', process_reset_request, name='process_reset_request'),
     path('force-password-change/', force_password_change, name='force_password_change'),
+    # Activity logs
+    path('system-activity-logs/', system_activity_logs, name='system_activity_logs'),
 ]

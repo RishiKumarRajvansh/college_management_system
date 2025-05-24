@@ -347,9 +347,30 @@
         <!-- Recent Activities Section -->
         <div class="row mt-4">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Recent Activities</h4>
+                <div class="card">                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>
+                            {% if user.profile.user_type == 'admin' %}
+                                System-wide Activities
+                            {% elif user.profile.user_type == 'faculty' %}
+                                Faculty-related Activities
+                            {% elif user.profile.user_type == 'student' %}
+                                Course & Student Activities
+                            {% else %}
+                                Recent Activities
+                            {% endif %}
+                        </h4>
+                        <div>
+                            <span class="badge bg-info">Relevant for your role</span>
+                            <a href="#" data-bs-toggle="tooltip" data-bs-placement="top" class="ms-2" 
+                               title="{% if user.profile.user_type == 'admin' %}You can see all system activities as an administrator.
+                               {% elif user.profile.user_type == 'faculty' %}You can see activities related to your courses, students, and personal actions.
+                               {% else %}You can see activities related to your courses, attendance, exams, and personal actions.{% endif %}">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                            {% if user.profile.user_type == 'admin' or user.profile.user_type == 'faculty' %}
+                            <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-sm btn-outline-primary float-end">View Full Log</a>
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

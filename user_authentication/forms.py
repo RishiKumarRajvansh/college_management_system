@@ -41,7 +41,28 @@ class UserRegistrationForm(UserCreationForm):
         'class': 'form-control',
         'placeholder': 'Phone Number'
     }))
-    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        
+        # Also check if any user has this email
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with this email already exists. Please use a different email.")
+            
+        # For student/faculty specific validation, we need user_type
+        user_type = self.data.get('user_type')  # Access from raw data instead of cleaned_data
+        
+        # Import here to avoid circular imports
+        if user_type == 'student':
+            from student_management.models import Student
+            if Student.objects.filter(email=email).exists():
+                raise forms.ValidationError("A student with this email already exists. Please use a different email.")
+        elif user_type == 'faculty':
+            from faculty_management.models import Faculty
+            if Faculty.objects.filter(email=email).exists():
+                raise forms.ValidationError("A faculty member with this email already exists. Please use a different email.")
+            
+        return email
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')

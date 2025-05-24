@@ -5,9 +5,10 @@ from faculty_management.models import Faculty
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ('course_name', 'faculty', 'description', 'credits')
+        fields = ('code', 'name', 'faculty', 'description', 'credits')
         widgets = {
-            'course_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Course Code (e.g., CS101)'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Course Name'}),
             'faculty': forms.Select(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'credits': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 10}),

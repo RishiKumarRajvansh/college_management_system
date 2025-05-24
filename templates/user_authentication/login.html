@@ -58,16 +58,15 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        
-                        <div class="d-grid gap-2">
+                          <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Login</button>
-                            <a href="{% url 'password_reset' %}" class="btn btn-link text-center">Forgot password?</a>
+                            <a href="{% url 'auth:password_reset' %}" class="btn btn-link text-center">Forgot password?</a>
                         </div>
                     </form>
                 </div>
                 
                 <div class="card-footer text-center py-3">
-                    <p class="mb-0">Don't have an account? <a href="{% url 'register' %}" class="text-primary">Register</a></p>
+                    <p class="mb-0">Don't have an account? <a href="{% url 'auth:register' %}" class="text-primary">Register</a></p>
                 </div>
             </div>
         </div>

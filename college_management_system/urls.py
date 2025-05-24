@@ -5,15 +5,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import home_view
+from .views import home_view, admin_dashboard, system_activity_logs
 from django.contrib.auth import views as auth_views
 from user_authentication.forms import LoginForm
 from user_authentication.views_auth import CustomLoginView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', home_view, name='home'),
-    path('auth/', include('user_authentication.urls')),
+    path('admin/', admin.site.urls),    path('', home_view, name='home'),
+    path('dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('system-logs/', system_activity_logs, name='system_activity_logs'),
+    path('auth/', include('user_authentication.urls', namespace='auth')),
     # Add login URL at project level with our custom view
     path('login/', CustomLoginView.as_view(), name='login'),
     path('students/', include('student_management.urls')),
