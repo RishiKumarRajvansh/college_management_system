@@ -1,540 +1,429 @@
 # College Management System
 
-A comprehensive Django-based system for managing all aspects of a college or educational institution, including student management, faculty management, course management, attendance tracking, examination management, library management, hostel management, fee collection, and reporting.
+A Django-based College Management System for managing academic and administrative workflows in an educational institution. The project uses Django, HTML templates, CSS, Tailwind CSS through CDN, JavaScript, and SQLite.
 
-## 📋 Features
+The system currently includes email-based authentication, role-aware dashboards, responsive Tailwind-styled pages, seeded testing data, activity logging, report generation support, and database backup tooling.
 
-### Core Features
-- **User Authentication System** with role-based access control (Admin, Faculty, Student)
-- **Student Management** - Registration, profiles, academic records, documents
-- **Faculty Management** - Staff records, profiles, teaching assignments
-- **Course Management** - Course catalog, curriculum planning, syllabus
-- **Attendance Management** - Track daily attendance, reports, statistics
-- **Examination System** - Exam scheduling, results management, grade reports
-- **Fee Management** - Fee structure, payments tracking, receipts, due alerts
-- **Library Management** - Book catalog, issuance, returns, fines
-- **Hostel Management** - Room allocation, student tracking, complaints
-- **Reporting Module** - Comprehensive reports with export options (PDF, Excel, CSV)
+## Current Project Status
 
-### Advanced Features
-- **Dynamic Dashboards** with real-time data visualization using Chart.js
-- **Notification System** for alerts, reminders, and announcements
-- **Report Export Functionality** in multiple formats (PDF, Excel, CSV)
-- **Responsive Design** for desktop and mobile accessibility
-- **Rich UI/UX** with Bootstrap 5 and custom styling
-- **Role-based Access Control** for security
+- Backend: Django with SQLite
+- Frontend: Django templates, Tailwind CDN, compatibility CSS, Font Awesome, JavaScript
+- Authentication: email-based login with case-sensitive password validation
+- UI: responsive Tailwind application shell and redesigned login page
+- Database: seeded SQLite database with realistic test data
+- Activity logs: dynamic audit log page with filters, pagination, CSV export, and login/logout event capture
+- Report artifact: generated academic project report in `.docx` format
+- Local server used for verification: `http://127.0.0.1:8000/`
 
-## 🚀 Implementation Details
+## Major Features
 
-The College Management System is fully functional with:
+### Authentication and Access
 
-- **Dynamic Data Visualization**: Four different chart types implemented:
-  - Attendance distribution (doughnut chart)
-  - Exam performance by course (bar chart)
-  - Enrollment trends (line chart)
-  - Fee collection analytics (bar chart)
-- **Real-time Data**: All charts fetch data via AJAX from dedicated API endpoints
-- **Responsive Design**: Charts resize based on viewport size
-- **Performance Optimization**: Client-side caching to reduce server load
-- **Auto-refresh**: Charts auto-refresh every 5 minutes
+- Email-based login instead of username-based login
+- Case-sensitive password validation using Django's authentication backend
+- User profiles with role types: administrator, faculty, and student
+- Staff test account mapped to administrative portal access
+- Password reset request workflow
+- Login/logout audit logging through Django auth signals
 
-### Notification System
-- Implemented `Notification` model for system messages
-- Real-time notification counter in the navbar
-- Mark-as-read functionality
-- Categorized notifications (info, warning, success, danger)
-- Admin capability to send notifications to users or groups
+### Academic Modules
 
-### Report Export Functionality
-- Export any data table to PDF, Excel, or CSV formats
-- Custom PDF template with college branding
-- Excel exports with proper formatting and headers
-- Bulk export capability for admin users
+- Student management
+- Faculty management
+- Course management
+- Attendance management
+- Examination scheduling
+- Result and grade management
+- Student profile and student self-service views
+- Faculty profile and faculty-oriented views
 
-### UI/UX Improvements
-- Responsive sidebar navigation
-- Custom card designs for dashboard modules
-- Consistent design language across all modules
-- Loading animations and state indicators
-- Form validation and error handling
-- Mobile-friendly controls and layouts
+### Administrative Modules
 
-## 📝 Requirements
+- Library management
+- Book issue and return workflow
+- Hostel management
+- Room and allocation tracking
+- Fee category, fee structure, and payment management
+- Report metadata and export support
+- Notification records
+- Database backup history
+- System activity logs
 
-- Python 3.8+
-- Django 3.2+
-- PostgreSQL/MySQL (production) or SQLite (development)
-- Additional requirements listed in requirements.txt
+### UI and Responsiveness
 
-## ⚙️ Installation for Development
+- Tailwind CSS loaded through CDN in the base templates
+- Responsive sidebar and header layout
+- Mobile-friendly login screen
+- Responsive tables and filter layouts
+- Font Awesome icons for navigation and actions
+- Compatibility CSS for legacy Bootstrap-style classes used by existing templates
 
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/college-management-system.git
-cd college-management-system
+## Seeded Test Accounts
+
+The current `db.sqlite3` has been reset and seeded with realistic dummy data. Use these accounts for testing:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@riverdale.edu` | `Admin@12345` |
+| Faculty | `aisha.raman@riverdale.edu` | `Faculty@12345` |
+| Student | `maya.patel@students.riverdale.edu` | `Student@12345` |
+| Staff | `nora.wilson@riverdale.edu` | `Staff@12345` |
+
+Note: the app schema currently supports `admin`, `faculty`, and `student` profile types. The staff account is a non-superuser Django staff account with admin-profile portal access for testing.
+
+## Seeded Data Summary
+
+The local SQLite database includes realistic test records:
+
+- 32 users and profiles
+- 6 faculty records
+- 24 student records
+- 8 courses
+- 240 attendance records
+- 24 examinations
+- 24 result records
+- Library books and book issue records
+- Hostels, rooms, and hostel allocations
+- Fee categories, fee structures, and payment records
+- Reports, notifications, backups, and audit logs
+
+## Important URLs
+
+| Page | URL |
+|---|---|
+| Login | `/login/` |
+| Admin Dashboard | `/dashboard/` |
+| Student Management | `/students/` |
+| Faculty Management | `/faculty/` |
+| Course Management | `/courses/` |
+| Attendance Management | `/attendance/` |
+| Examination Management | `/examinations/` |
+| Library Management | `/library/` |
+| Hostel Management | `/hostel/` |
+| Fee Management | `/fees/` |
+| Reporting | `/reports/` |
+| Activity Logs | `/auth/system-activity-logs/` |
+| Password Reset Request | `/auth/password-reset/` |
+
+## System Activity Logs
+
+The activity log page is available at:
+
+```text
+/auth/system-activity-logs/
 ```
 
-2. Create and activate a virtual environment
-```bash
+It supports:
+
+- Dynamic records from the `AuditTrail` table
+- Login/logout events
+- Profile and user-management events
+- Module filter
+- Action filter
+- User filter
+- Date range filter
+- Search across description, module, username, email, and IP address
+- Pagination for larger log sets
+- CSV export
+- Responsive Tailwind UI
+
+The legacy route `/system-logs/` delegates to the same improved activity log implementation.
+
+## Project Report
+
+A complete academic project report has been generated from the synopsis and the project codebase.
+
+Generated report:
+
+```text
+reports/College_Management_System_Project_Report.docx
+```
+
+Generated assets:
+
+```text
+reports/assets/
+```
+
+The report includes:
+
+- Cover page
+- Certificate
+- Acknowledgement
+- Overview and problem profile
+- Existing and proposed system
+- Objectives and methodology
+- Modules
+- Technology stack
+- Requirement analysis
+- Functional and non-functional requirements
+- Feasibility analysis
+- Project planning and schedule
+- DFD, ER diagram, use case diagram, architecture diagram
+- Database schema
+- Major code snippets with explanations
+- Testing tables and validation details
+- Implementation and deployment notes
+- Screenshots of important pages
+- Future recommendations
+- Bibliography
+
+The generated DOCX was validated with:
+
+- 17,589 estimated words
+- 969 paragraphs
+- 24 tables
+- 16 embedded diagrams/screenshots
+- 194 explicit page breaks
+
+## Report Generator
+
+The project report can be regenerated with:
+
+```powershell
+python tools\generate_project_report.py
+```
+
+The generator expects the synopsis at:
+
+```text
+C:\Users\vega6\Desktop\Download backup\Synopsis.docx
+```
+
+It captures screenshots from the live local application at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Before running the generator, start the server and ensure the seeded accounts exist.
+
+Optional dependencies used by the generator:
+
+```powershell
+python -m pip install python-docx matplotlib websocket-client
+```
+
+## Database Backup Utility
+
+The database backup utility is located at:
+
+```text
+tools/backup_database.py
+```
+
+Create a manual SQLite backup:
+
+```powershell
+python tools\backup_database.py --manual --notes "Manual backup before testing"
+```
+
+Create a backup attributed to a user ID:
+
+```powershell
+python tools\backup_database.py --manual --user 1 --notes "Admin-triggered backup"
+```
+
+Backups are written to:
+
+```text
+backups/
+```
+
+Backup metadata is recorded in the `DatabaseBackup` model.
+
+## Requirements
+
+Core requirements are listed in:
+
+```text
+requirements.txt
+```
+
+Main runtime requirements:
+
+- Python 3.8+
+- Django 3.2.x
+- SQLite for local development
+- Pillow
+- ReportLab
+- openpyxl
+- python-dateutil
+- psutil
+
+Optional production and development packages are also listed in `requirements.txt`.
+
+## Local Setup
+
+1. Create and activate a virtual environment.
+
+```powershell
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 
-3. Install dependencies
-```bash
-pip install -r requirements.txt
+2. Install dependencies.
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-4. Run migrations
-```bash
+3. Apply migrations.
+
+```powershell
 python manage.py migrate
 ```
 
-5. Create a superuser
-```bash
-python manage.py createsuperuser
+4. Run checks.
+
+```powershell
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py migrate --check
 ```
 
-6. Run the development server
-```bash
-python manage.py runserver
+5. Start the development server.
+
+```powershell
+python manage.py runserver 127.0.0.1:8000
 ```
 
-7. Access the application at http://127.0.0.1:8000/
+If `DEBUG=False` is active in your environment and static CSS is not being served locally, use:
 
-## 🌐 Production Deployment Guide
-
-This section provides comprehensive instructions for deploying the College Management System to a production environment.
-
-### Production Requirements
-
-- Python 3.8+
-- PostgreSQL 12+ (recommended) or MySQL 8.0+
-- Nginx or Apache web server
-- Domain name (optional but recommended)
-- SSL certificate (strongly recommended)
-- Linux server (Ubuntu 20.04+ recommended)
-- At least 2GB RAM and 2 CPU cores
-- 20GB+ disk space
-
-### 1. Server Preparation
-
-#### Update the system
-```bash
-sudo apt update
-sudo apt upgrade -y
+```powershell
+python manage.py runserver 127.0.0.1:8000 --insecure
 ```
 
-#### Install dependencies
-```bash
-sudo apt install -y python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl build-essential libssl-dev
+6. Open the app.
+
+```text
+http://127.0.0.1:8000/
 ```
 
-#### Create a Python virtual environment
-```bash
-sudo apt install -y python3-venv
-mkdir -p /var/www/college_management_system
-cd /var/www/college_management_system
-python3 -m venv env
-source env/bin/activate
+## Useful Verification Commands
+
+Run Django checks:
+
+```powershell
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py migrate --check
 ```
 
-### 2. Database Setup
+Run the test suite:
 
-#### PostgreSQL setup
-```bash
-sudo -u postgres psql
-
-# In PostgreSQL prompt:
-CREATE DATABASE college_management_system;
-CREATE USER cms_user WITH PASSWORD 'secure_password';
-ALTER ROLE cms_user SET client_encoding TO 'utf8';
-ALTER ROLE cms_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE cms_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE college_management_system TO cms_user;
-\q
+```powershell
+python manage.py test
 ```
 
-### 3. Application Setup
+Current note: the project currently has no formal Django test cases, so `python manage.py test` reports `0` tests but still runs Django system checks.
 
-#### Clone the repository and install requirements
-```bash
-git clone https://github.com/yourusername/college_management_system.git src
-cd src
-pip install -r requirements.txt
-pip install gunicorn psycopg2-binary
+## Database Schema Overview
+
+Important models include:
+
+- `UserProfile`
+- `AuditTrail`
+- `PasswordResetRequest`
+- `Student`
+- `Faculty`
+- `Course`
+- `Attendance`
+- `Examination`
+- `Result`
+- `Book`
+- `BookIssue`
+- `Hostel`
+- `Room`
+- `HostelAllocation`
+- `FeeCategory`
+- `FeeStructure`
+- `Payment`
+- `Notification`
+- `Report`
+- `DatabaseBackup`
+
+Key relationships:
+
+- User to UserProfile: one-to-one
+- User to Student/Faculty profile: one-to-one
+- Faculty to Course: one-to-many
+- Course to Student: one-to-many
+- Student and Course to Attendance: many-to-one links
+- Course to Examination: one-to-many
+- Student and Examination to Result: many-to-one links
+- Student and Book to BookIssue: many-to-one links
+- Hostel to Room: one-to-many
+- Student to HostelAllocation: one-to-one
+- FeeCategory and Course to FeeStructure: many-to-one links
+- Student and FeeStructure to Payment: many-to-one links
+- User to AuditTrail, Report, Notification, and DatabaseBackup records
+
+## Project Structure
+
+```text
+college_management_system/
+|-- attendance_management/
+|-- college_management_system/
+|-- course_management/
+|-- examination/
+|-- faculty_management/
+|-- fee_management/
+|-- hostel_management/
+|-- library_management/
+|-- reporting/
+|-- student_management/
+|-- user_authentication/
+|-- static/
+|-- templates/
+|-- tools/
+|-- reports/
+|-- db.sqlite3
+`-- manage.py
 ```
 
-#### Create .env file for environment variables
-```bash
-cd college_management_system  # Directory with settings.py
-cat > .env << EOF
-DEBUG=False
-SECRET_KEY=your_secure_secret_key_here
-ALLOWED_HOSTS=your.domain.com,www.your.domain.com,your-server-ip
-DB_NAME=college_management_system
-DB_USER=cms_user
-DB_PASSWORD=secure_password
-DB_HOST=localhost
-DB_PORT=5432
-EMAIL_HOST=smtp.your-email-provider.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@example.com
-EMAIL_HOST_PASSWORD=your_email_password
-EOF
-```
-
-#### Modify settings.py
-```python
-# Import environment variables
-from decouple import config
-import os
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
-
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', cast=int),
-    }
-}
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-```
-
-#### Apply migrations and collect static files
-```bash
-cd /var/www/college_management_system/src
-python manage.py migrate
-python manage.py collectstatic --no-input
-python manage.py createsuperuser
-```
-
-### 4. Web Server Configuration
-
-#### Create Gunicorn service
-```bash
-sudo nano /etc/systemd/system/gunicorn.service
-```
-
-Add the following content:
-```ini
-[Unit]
-Description=gunicorn daemon
-After=network.target
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/var/www/college_management_system/src
-ExecStart=/var/www/college_management_system/env/bin/gunicorn \
-          --access-logfile - \
-          --workers 3 \
-          --bind unix:/var/www/college_management_system/college_management_system.sock \
-          college_management_system.wsgi:application
-
-[Install]
-WantedBy=multi-user.target
-```
-
-#### Start Gunicorn
-```bash
-sudo systemctl start gunicorn
-sudo systemctl enable gunicorn
-```
-
-#### Configure Nginx
-```bash
-sudo nano /etc/nginx/sites-available/college_management_system
-```
-
-Add the following content:
-```nginx
-server {
-    listen 80;
-    server_name your.domain.com www.your.domain.com;
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    
-    location /static/ {
-        root /var/www/college_management_system/src;
-    }
-
-    location /media/ {
-        root /var/www/college_management_system/src;
-    }
-
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/var/www/college_management_system/college_management_system.sock;
-    }
-}
-```
-
-Enable the site:
-```bash
-sudo ln -s /etc/nginx/sites-available/college_management_system /etc/nginx/sites-enabled
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-### 5. SSL Configuration
-
-#### Install Certbot
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-```
-
-#### Obtain SSL certificate
-```bash
-sudo certbot --nginx -d your.domain.com -d www.your.domain.com
-```
-
-### 6. Security Measures
-
-#### Set up firewall
-```bash
-sudo apt install -y ufw
-sudo ufw allow 'Nginx Full'
-sudo ufw allow 'OpenSSH'
-sudo ufw enable
-```
-
-#### Configure automatic security updates
-```bash
-sudo apt install -y unattended-upgrades apt-listchanges
-sudo dpkg-reconfigure -plow unattended-upgrades
-```
-
-### 7. Backup Strategy
-
-#### Setup daily database backups
-```bash
-sudo apt install -y postgresql-client
-
-# Create backup script
-sudo nano /usr/local/bin/backup_database.sh
-```
-
-Add the following content:
-```bash
-#!/bin/bash
-BACKUP_DIR="/var/backups/postgres"
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-DB_NAME="college_management_system"
-BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql"
-
-mkdir -p $BACKUP_DIR
-
-# Backup the database
-PGPASSWORD="secure_password" pg_dump -U cms_user -h localhost -F p $DB_NAME > $BACKUP_FILE
-
-# Compress the backup
-gzip $BACKUP_FILE
-
-# Remove backups older than 30 days
-find $BACKUP_DIR -type f -name "${DB_NAME}_*.sql.gz" -mtime +30 -delete
-```
-
-Make the script executable and configure cron job:
-```bash
-sudo chmod +x /usr/local/bin/backup_database.sh
-sudo crontab -e
-```
-
-Add the following line to run daily at 2 AM:
-```
-0 2 * * * /usr/local/bin/backup_database.sh
-```
-
-### 8. Performance Optimization
-
-#### Configure caching
-```bash
-sudo apt install -y redis-server
-sudo systemctl enable redis-server
-pip install django-redis
-```
-
-Add to settings.py:
-```python
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
-```
-
-#### Media file optimization
-Install Pillow optimizers:
-```bash
-sudo apt install -y jpegoptim optipng
-```
-
-### 9. Monitoring
-
-#### Setup basic monitoring with Monit
-```bash
-sudo apt install -y monit
-```
-
-Configure Monit for Gunicorn and Nginx:
-```bash
-sudo nano /etc/monit/conf.d/gunicorn
-```
-
-Add:
-```
-check process gunicorn with pidfile /var/run/gunicorn.pid
-    start program = "/bin/systemctl start gunicorn"
-    stop program = "/bin/systemctl stop gunicorn"
-    if failed unixsocket /var/www/college_management_system/college_management_system.sock then restart
-    if 5 restarts within 5 cycles then timeout
-```
-
-```bash
-sudo nano /etc/monit/conf.d/nginx
-```
-
-Add:
-```
-check process nginx with pidfile /var/run/nginx.pid
-    start program = "/bin/systemctl start nginx"
-    stop program = "/bin/systemctl stop nginx"
-    if failed port 80 protocol http request "/" then restart
-    if 5 restarts within 5 cycles then timeout
-```
-
-Restart Monit:
-```bash
-sudo systemctl restart monit
-```
-
-### 10. Maintenance
-
-#### Create maintenance mode script
-```bash
-sudo nano /usr/local/bin/maintenance_mode.sh
-```
-
-Add:
-```bash
-#!/bin/bash
-NGINX_CONF="/etc/nginx/sites-available/college_management_system"
-MAINTENANCE_CONF="/etc/nginx/sites-available/maintenance"
-
-if [ "$1" == "on" ]; then
-    # Create maintenance page
-    mkdir -p /var/www/html/maintenance
-    cat > /var/www/html/maintenance/index.html << EOF
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Maintenance Mode</title>
-        <style>
-            body { font-family: Arial, sans-serif; text-align: center; padding-top: 100px; }
-            h1 { color: #333; }
-            p { color: #666; }
-        </style>
-    </head>
-    <body>
-        <h1>We'll be back soon!</h1>
-        <p>The College Management System is currently undergoing scheduled maintenance.</p>
-        <p>Please check back in a few minutes.</p>
-    </body>
-    </html>
-EOF
-
-    # Create maintenance Nginx config
-    cat > "$MAINTENANCE_CONF" << EOF
-    server {
-        listen 80 default_server;
-        server_name _;
-        root /var/www/html/maintenance;
-        index index.html;
-        location / {
-            try_files \$uri \$uri/ =404;
-        }
-    }
-EOF
-    sudo ln -sf "$MAINTENANCE_CONF" /etc/nginx/sites-enabled/default
-    sudo systemctl reload nginx
-    echo "Maintenance mode activated."
-elif [ "$1" == "off" ]; then
-    sudo rm -f /etc/nginx/sites-enabled/default
-    sudo systemctl reload nginx
-    echo "Maintenance mode deactivated."
-else
-    echo "Usage: $0 [on|off]"
-    exit 1
-fi
-```
-
-Make the script executable:
-```bash
-sudo chmod +x /usr/local/bin/maintenance_mode.sh
-```
-
-## 📊 Database Schema
-
-The system uses a relational database with the following key models:
-
-1. **User & Profile** - Authentication and user information
-2. **Student** - Student details, academic records, etc.
-3. **Faculty** - Faculty details, subjects, etc.
-4. **Course** - Course information, curriculum, etc.
-5. **Attendance** - Daily attendance records
-6. **Examination & Result** - Exam schedules and student results
-7. **FeeStructure & Payment** - Fee details and payment records
-8. **Book & BookIssue** - Library book catalog and lending records
-9. **Hostel & Room** - Hostel and room management
-10. **Report & Notification** - Reporting and notification system
-
-## 🤝 Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-* [Django](https://www.djangoproject.com/) - The web framework used
-* [Bootstrap 5](https://getbootstrap.com/) - Frontend framework
-* [Chart.js](https://www.chartjs.org/) - JavaScript charting library
-* [DataTables](https://datatables.net/) - Table plugin for jQuery
-* [Font Awesome](https://fontawesome.com/) - Icon toolkit
+## Frontend Notes
+
+- Tailwind is loaded from CDN in `templates/base.html` and `templates/base_minimal.html`.
+- `static/css/tailwind-compat.css` keeps existing Bootstrap-style classes readable while the UI is modernized.
+- The login page is redesigned in `templates/user_authentication/login.html`.
+- The activity logs page is redesigned in `templates/system_activity_logs.html`.
+
+## Production Notes
+
+For production deployment:
+
+- Set `DEBUG=False`.
+- Set a strong `SECRET_KEY`.
+- Configure `ALLOWED_HOSTS`.
+- Use PostgreSQL or MySQL instead of SQLite for high-concurrency use.
+- Run `python manage.py collectstatic`.
+- Serve the app with Gunicorn or uWSGI behind Nginx or Apache.
+- Use HTTPS.
+- Schedule database backups.
+- Add automated test coverage before production rollout.
+
+## Maintenance Recommendations
+
+- Add formal unit and integration tests for all modules.
+- Add object-level permissions for sensitive records.
+- Expand audit logging to cover every create, update, and delete event.
+- Move report generation settings such as synopsis path into environment variables.
+- Add a reusable seed command for test data.
+- Consider PostgreSQL for production use.
+- Add CI checks for migrations, formatting, and tests.
+
+## License
+
+This project is intended for academic submission and demonstration. Add a formal license file if the project will be distributed publicly.
+
+## Acknowledgements
+
+- Django
+- Python
+- SQLite
+- Tailwind CSS
+- Font Awesome
+- ReportLab
+- openpyxl
+- python-docx
