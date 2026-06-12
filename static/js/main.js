@@ -1,22 +1,103 @@
 // Custom JavaScript for College Management System
 
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Lightweight Tailwind-friendly dropdowns, modals and tabs replace the old UI bundle.
+    document.querySelectorAll('[data-menu-toggle]').forEach(function(toggle) {
+        toggle.addEventListener('click', function(event) {
+            event.preventDefault();
+            const menu = document.getElementById(toggle.getAttribute('aria-controls')) || toggle.nextElementSibling;
+            if (!menu) {
+                return;
+            }
+            document.querySelectorAll('.dropdown-menu.show').forEach(function(openMenu) {
+                if (openMenu !== menu) {
+                    openMenu.classList.remove('show');
+                }
+            });
+            menu.classList.toggle('show');
+        });
     });
 
-    // Initialize popovers
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    document.querySelectorAll('[data-modal-target]').forEach(function(trigger) {
+        trigger.addEventListener('click', function(event) {
+            event.preventDefault();
+            const modal = document.getElementById(trigger.dataset.modalTarget);
+            if (modal) {
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-modal-close]').forEach(function(trigger) {
+        trigger.addEventListener('click', function() {
+            const modal = trigger.closest('.modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+        });
+    });
+
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+        });
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            document.querySelectorAll('.modal.show').forEach(function(modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            });
+        }
+    });
+
+    document.querySelectorAll('[data-tab-target]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            const target = document.querySelector(tab.dataset.tabTarget);
+            const tabList = tab.closest('[role="tablist"]');
+            const content = target ? target.parentElement : null;
+
+            if (!target || !tabList || !content) {
+                return;
+            }
+
+            tabList.querySelectorAll('[data-tab-target]').forEach(function(item) {
+                item.classList.remove('active');
+                item.setAttribute('aria-selected', 'false');
+            });
+            content.querySelectorAll('.tab-pane').forEach(function(pane) {
+                pane.classList.remove('show', 'active');
+            });
+
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            target.classList.add('show', 'active');
+        });
     });
     
     // Auto-hide alerts after 5 seconds
     setTimeout(function() {
-        $('.alert').alert('close');
+        document.querySelectorAll('.alert').forEach(function(alert) {
+            alert.style.transition = 'opacity 0.2s ease';
+            alert.style.opacity = '0';
+            window.setTimeout(function() {
+                alert.remove();
+            }, 250);
+        });
     }, 5000);
     
     // Confirmation dialog for delete actions

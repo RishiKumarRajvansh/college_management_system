@@ -51,7 +51,7 @@ class AuditTrail(models.Model):
         return dict(self.ACTION_TYPES).get(self.action, self.action)
         
     def get_action_type_color(self):
-        """Return Bootstrap color class based on action type"""
+        """Return semantic color class suffix based on action type."""
         color_map = {
             'login': 'success',
             'logout': 'secondary',

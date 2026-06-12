@@ -113,11 +113,11 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs" id="resultsTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-results" type="button" role="tab" aria-controls="all-results" aria-selected="true">All Results</button>
+                            <button class="nav-link active" id="all-tab" data-tab-target="#all-results" type="button" role="tab" aria-controls="all-results" aria-selected="true">All Results</button>
                         </li>
                         {% for course_name, course_results in courses.items %}
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="{{ course_name|slugify }}-tab" data-bs-toggle="tab" data-bs-target="#{{ course_name|slugify }}-results" type="button" role="tab" aria-controls="{{ course_name|slugify }}-results" aria-selected="false">{{ course_name }}</button>
+                            <button class="nav-link" id="{{ course_name|slugify }}-tab" data-tab-target="#{{ course_name|slugify }}-results" type="button" role="tab" aria-controls="{{ course_name|slugify }}-results" aria-selected="false">{{ course_name }}</button>
                         </li>
                         {% endfor %}
                     </ul>

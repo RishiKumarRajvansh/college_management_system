@@ -604,26 +604,23 @@ function showLoading(show) {
 }
 
 function showError(message) {
-    // Create a toast notification for errors
+    // Create a Tailwind-compatible toast notification for errors.
     const toast = document.createElement('div');
-    toast.className = 'toast position-fixed top-0 end-0 m-3';
+    toast.className = 'toast-notice';
     toast.innerHTML = `
-        <div class="toast-header bg-danger text-white">
+        <div class="toast-notice-header">
             <i class="fas fa-exclamation-circle me-2"></i>
             <strong class="me-auto">Error</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
         </div>
-        <div class="toast-body">${message}</div>
+        <div class="toast-notice-body">${message}</div>
     `;
     document.body.appendChild(toast);
-    
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    
-    // Remove toast element after it's hidden
-    toast.addEventListener('hidden.bs.toast', () => {
+
+    toast.querySelector('.btn-close').addEventListener('click', () => {
         toast.remove();
     });
+    window.setTimeout(() => toast.remove(), 6000);
 }
 
 function refreshDashboard() {

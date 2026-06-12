@@ -56,7 +56,7 @@ The system currently includes email-based authentication, role-aware dashboards,
 - Mobile-friendly login screen
 - Responsive tables and filter layouts
 - Font Awesome icons for navigation and actions
-- Compatibility CSS for legacy Bootstrap-style classes used by existing templates
+- Compatibility CSS for older module class names while templates continue moving to Tailwind utilities
 
 ## Seeded Test Accounts
 
@@ -64,10 +64,10 @@ The current `db.sqlite3` has been reset and seeded with realistic dummy data. Us
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@riverdale.edu` | `Admin@12345` |
-| Faculty | `aisha.raman@riverdale.edu` | `Faculty@12345` |
-| Student | `maya.patel@students.riverdale.edu` | `Student@12345` |
-| Staff | `nora.wilson@riverdale.edu` | `Staff@12345` |
+| Admin | `admin@ignou.com` | `Admin@12345` |
+| Faculty | `aisha.raman@ignou.com` | `Faculty@12345` |
+| Student | `maya.patel@ignou.com` | `Student@12345` |
+| Staff | `nora.wilson@ignou.com` | `Staff@12345` |
 
 Note: the app schema currently supports `admin`, `faculty`, and `student` profile types. The staff account is a non-superuser Django staff account with admin-profile portal access for testing.
 
@@ -129,6 +129,64 @@ It supports:
 
 The legacy route `/system-logs/` delegates to the same improved activity log implementation.
 
+## Project Report
+
+The generated academic report is available at:
+
+```text
+reports/College_Management_System_Project_Report.docx
+```
+
+The report has been regenerated after the Tailwind and `@ignou.com` updates. It includes:
+
+- Cover page, certificate, acknowledgement, overview, objectives, methodology, requirements, feasibility, planning, implementation, testing, bibliography, and appendices
+- DFD, ER, use case, and architecture diagrams
+- Database schema tables generated from the Django models
+- Code snippets from authentication, activity logs, models, templates, and backup tooling
+- Screenshots captured from the live Tailwind-styled application
+- Updated role credentials using the `@ignou.com` domain
+
+Current generated report metrics:
+
+- 194 explicit page breaks
+- 969 paragraphs
+- 24 tables
+- 11 live application screenshots
+- 5 generated diagrams
+
+Screenshots and diagram assets are stored in:
+
+```text
+reports/assets/
+```
+
+## Report Generator
+
+The report generator is located at:
+
+```text
+tools/generate_project_report.py
+```
+
+Generate the report:
+
+```powershell
+python tools\generate_project_report.py
+```
+
+The generator reads the synopsis from:
+
+```text
+C:\Users\vega6\Desktop\Download backup\Synopsis.docx
+```
+
+It captures screenshots from the local Django server at:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Start the server before running the generator.
 
 ## Database Backup Utility
 
@@ -176,6 +234,9 @@ Main runtime requirements:
 - openpyxl
 - python-dateutil
 - psutil
+- python-docx
+- matplotlib
+- websocket-client
 
 Optional production and development packages are also listed in `requirements.txt`.
 
@@ -311,7 +372,7 @@ college_management_system/
 ## Frontend Notes
 
 - Tailwind is loaded from CDN in `templates/base.html` and `templates/base_minimal.html`.
-- `static/css/tailwind-compat.css` keeps existing Bootstrap-style classes readable while the UI is modernized.
+- `static/css/tailwind-compat.css` keeps older module class names readable while the UI is modernized.
 - The login page is redesigned in `templates/user_authentication/login.html`.
 - The activity logs page is redesigned in `templates/system_activity_logs.html`.
 

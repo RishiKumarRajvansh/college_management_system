@@ -327,9 +327,9 @@ def capture_screenshots():
     if not chrome.exists():
         return {}
 
-    admin = User.objects.get(email="admin@riverdale.edu")
-    student = User.objects.get(email="maya.patel@students.riverdale.edu")
-    faculty = User.objects.get(email="aisha.raman@riverdale.edu")
+    admin = User.objects.get(email="admin@ignou.com")
+    student = User.objects.get(email="maya.patel@ignou.com")
+    faculty = User.objects.get(email="aisha.raman@ignou.com")
 
     def session_cookie_for(user):
         client = Client(HTTP_HOST="127.0.0.1")
@@ -671,7 +671,7 @@ def make_report(synopsis_text, synopsis_paragraphs, model_metadata, counts, diag
         "Introduction to Project",
         [
             "The College Management System is a web-based information system built using Python and Django. It uses Django's MTV architecture: models define the database structure, templates define the presentation layer, and views coordinate request processing, validation, and response rendering. The system is accessed through a browser and persists data in SQLite.",
-            "The front end uses HTML templates, Tailwind CSS through CDN, compatibility CSS for existing Bootstrap-style classes, Font Awesome icons, and JavaScript for small interactive behaviors such as sidebar toggling and password visibility. The project is suitable for academic demonstration because it combines full-stack development concepts with a realistic institutional use case.",
+            "The front end uses HTML templates, Tailwind CSS through CDN, compatibility CSS for older module class names, Font Awesome icons, and JavaScript for small interactive behaviors such as sidebar toggling and password visibility. The project is suitable for academic demonstration because it combines full-stack development concepts with a realistic institutional use case.",
             "The application includes separate modules that work together. A student profile is linked to a user account and a course. A course is linked to faculty. Attendance links student and course. Results link student and examination. Payments link student and fee structure. These relationships demonstrate practical database normalization.",
         ],
     )
@@ -752,7 +752,7 @@ def make_report(synopsis_text, synopsis_paragraphs, model_metadata, counts, diag
         ]),
         ("Methodology: Design Phase", [
             "The design phase produced the logical database schema, module boundaries, URL patterns, view responsibilities, forms, templates, and navigation structure. ER diagrams and DFDs represent how data flows through the system.",
-            "A responsive layout was designed through a common base template. Tailwind CSS provides utility-based styling while compatibility CSS supports legacy Bootstrap-style class names already present in templates.",
+            "A responsive layout was designed through a common base template. Tailwind CSS provides utility-based styling while compatibility CSS supports older class names already present in templates.",
         ]),
         ("Methodology: Implementation Phase", [
             "Implementation was carried out using Django apps. Each module contains models, views, forms, URLs, and templates as required. SQLite stores the data and Django migrations define schema changes.",
@@ -832,7 +832,7 @@ def make_report(synopsis_text, synopsis_paragraphs, model_metadata, counts, diag
             f"User Interface and Responsiveness: {name}",
             [
                 f"The user interface for {name} is rendered through Django templates and the common Tailwind-enabled base layout. Important screens include {screens}. These screens use headings, tables, cards, forms, buttons, icons, and alerts to make information easier to scan. The layout is intentionally consistent across modules so users do not need to learn a new interface for every administrative task.",
-                "Responsive behavior is essential because administrators, faculty, and students may access the system from different devices. The common base template includes viewport configuration, Tailwind CDN loading, a responsive sidebar/header layout, and compatibility CSS for legacy Bootstrap-like classes. Tables use responsive containers where horizontal space is limited, which prevents broken layouts on mobile screens.",
+                "Responsive behavior is essential because administrators, faculty, and students may access the system from different devices. The common base template includes viewport configuration, Tailwind CDN loading, a responsive sidebar/header layout, and compatibility CSS for older module classes. Tables use responsive containers where horizontal space is limited, which prevents broken layouts on mobile screens.",
                 f"The interface design also supports user confidence. Important actions are presented as clear buttons, destructive actions use confirmation pages, and badges distinguish statuses such as payment state, result status, or activity action. These visual cues reduce mistakes and make the system more suitable for regular institutional use.",
             ],
         )
@@ -1144,10 +1144,10 @@ def make_report(synopsis_text, synopsis_paragraphs, model_metadata, counts, diag
     appendix_topics = [
         ("Appendix A: Synopsis Source Summary", synopsis_paragraphs[:12]),
         ("Appendix B: Authentication Credentials Used for Testing", [
-            "Admin: admin@riverdale.edu / Admin@12345",
-            "Faculty: aisha.raman@riverdale.edu / Faculty@12345",
-            "Student: maya.patel@students.riverdale.edu / Student@12345",
-            "Staff: nora.wilson@riverdale.edu / Staff@12345",
+            "Admin: admin@ignou.com / Admin@12345",
+            "Faculty: aisha.raman@ignou.com / Faculty@12345",
+            "Student: maya.patel@ignou.com / Student@12345",
+            "Staff: nora.wilson@ignou.com / Staff@12345",
         ]),
         ("Appendix C: Important Local URLs", [
             "/login/",

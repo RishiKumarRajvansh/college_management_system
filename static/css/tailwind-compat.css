@@ -1,7 +1,7 @@
 /*
  * Tailwind CDN powers the shared layout. This file keeps legacy module
- * templates readable while they are gradually converted from Bootstrap
- * class names to first-class Tailwind markup.
+ * templates readable while they are gradually converted to utility-first
+ * Tailwind markup.
  */
 :root {
     --cms-primary: #2563eb;
@@ -279,6 +279,78 @@ input:focus {
 }
 .dropdown-item:hover { background: #eff6ff; color: var(--cms-primary); }
 .dropdown-divider { height: 1px; background: #e2e8f0; margin: 0.5rem 0; }
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 1rem;
+}
+.modal.show { display: grid; place-items: center; }
+.modal-dialog {
+    width: min(100%, 56rem);
+    margin: auto;
+}
+.modal-content {
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.3);
+}
+.modal-header,
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-color: #e2e8f0;
+    padding: 1rem 1.25rem;
+}
+.modal-header { border-bottom: 1px solid #e2e8f0; }
+.modal-footer { border-top: 1px solid #e2e8f0; justify-content: flex-end; }
+.modal-body { padding: 1.25rem; }
+.modal-title { margin: 0; font-size: 1.125rem; font-weight: 700; }
+.close {
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.toast-notice {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    z-index: 70;
+    max-width: min(24rem, calc(100vw - 2rem));
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+    overflow: hidden;
+}
+.toast-notice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    background: var(--cms-danger);
+    color: #fff;
+    padding: 0.75rem 1rem;
+}
+.toast-notice-body { padding: 0.875rem 1rem; color: #334155; }
+.btn-close {
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+}
 
 .nav-tabs {
     display: flex;

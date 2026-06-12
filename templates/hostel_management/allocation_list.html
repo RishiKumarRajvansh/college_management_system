@@ -63,7 +63,7 @@
             <h6 class="m-0 font-weight-bold text-primary">Room Allocations List</h6>
             <div class="dropdown no-arrow">
                 <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    data-menu-toggle aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in"
@@ -118,14 +118,14 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{% url 'allocation_detail' allocation.allocation_id %}" class="btn btn-info" data-bs-toggle="tooltip" title="View Details">
+                                    <a href="{% url 'allocation_detail' allocation.allocation_id %}" class="btn btn-info" data-tooltip title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{% url 'allocation_update' allocation.allocation_id %}" class="btn btn-warning" data-bs-toggle="tooltip" title="Edit Allocation">
+                                    <a href="{% url 'allocation_update' allocation.allocation_id %}" class="btn btn-warning" data-tooltip title="Edit Allocation">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     {% if allocation.is_active %}
-                                    <a href="{% url 'vacate_room' allocation.allocation_id %}" class="btn btn-danger" data-bs-toggle="tooltip" title="Vacate Room">
+                                    <a href="{% url 'vacate_room' allocation.allocation_id %}" class="btn btn-danger" data-tooltip title="Vacate Room">
                                         <i class="fas fa-door-open"></i>
                                     </a>
                                     {% endif %}
@@ -187,12 +187,8 @@
 
 {% block extra_js %}
 <script>
-    // Enable tooltips
+    // Native title attributes provide lightweight Tailwind-friendly tooltips.
     document.addEventListener('DOMContentLoaded', function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
     });
 </script>
 {% endblock %}

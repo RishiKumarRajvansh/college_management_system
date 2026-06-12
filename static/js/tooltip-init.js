@@ -1,8 +1,8 @@
-// Initialize Bootstrap Tooltips
+// Keep native browser title tooltips available on Tailwind-styled controls.
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    document.querySelectorAll('[data-tooltip]').forEach(function(element) {
+        if (element.dataset.tooltip && !element.getAttribute('title')) {
+            element.setAttribute('title', element.dataset.tooltip);
+        }
     });
 });

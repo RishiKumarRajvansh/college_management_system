@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle dropdown toggles (only for dropdown toggles, not regular links)
     document.querySelectorAll('.sidebar-menu .dropdown-toggle').forEach(toggle => {
-        // Remove Bootstrap's data-bs-toggle functionality and implement our own
+        // Keep menu behavior framework-free for the Tailwind interface.
         toggle.addEventListener('click', function(e) {
             // Only prevent default if it's an actual dropdown toggle
             if (this.classList.contains('dropdown-toggle')) {
