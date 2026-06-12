@@ -104,7 +104,7 @@
                                 {% for course in courses %}
                                 <tr>
                                     <td>{{ course.course_id }}</td>
-                                    <td>{{ course.course_name }}</td>
+                                    <td>{{ course.name }}</td>
                                     <td>{{ course.schedule|default:"Not scheduled" }}</td>
                                     <td>{{ course.student_set.count }}</td>
                                     <td>

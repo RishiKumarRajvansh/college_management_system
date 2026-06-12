@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.http import HttpResponse
 from datetime import datetime, timedelta
 from user_authentication.models import UserProfile
@@ -145,7 +145,9 @@ def examination_delete(request, pk):
         return redirect('examination_list')
     
     context = {
-        'object': examination,
+        # The confirmation template needs the named object to build exam_id URLs.
+        'examination': examination,
+        'has_results': examination.results.exists(),
         'title': 'Delete Examination',
     }
     
@@ -317,7 +319,8 @@ def result_delete(request, pk):
         return redirect('result_list')
     
     context = {
-        'object': result,
+        # The confirmation template needs the named object to build result_id URLs.
+        'result': result,
         'title': 'Delete Result',
     }
     
@@ -326,15 +329,66 @@ def result_delete(request, pk):
 @login_required
 def student_results(request, student_id=None):
     """View to display results for a specific student or the logged-in student"""
+    def build_student_results_context(student, results, title):
+        result_list = list(results)
+        total_exams = len(result_list)
+        passed_exams = sum(1 for result in result_list if result.status == 'pass')
+        pass_percentage = (passed_exams / total_exams * 100) if total_exams else 0
+        avg_percentage = (
+            sum(float(result.percentage or 0) for result in result_list) / total_exams
+            if total_exams else 0
+        )
+
+        grade_distribution = {}
+        for result in result_list:
+            grade = result.grade or 'N/A'
+            grade_distribution[grade] = grade_distribution.get(grade, 0) + 1
+
+        courses = {}
+        for result in result_list:
+            course_name = result.examination.course.name
+            courses.setdefault(course_name, []).append(result)
+
+        grade_rank = {'A+': 8, 'A': 7, 'B+': 6, 'B': 5, 'C+': 4, 'C': 3, 'D': 2, 'F': 1}
+
+        def best_grade_for(items):
+            grades = [item.grade for item in items if item.grade]
+            return max(grades, key=lambda grade: grade_rank.get(grade, 0)) if grades else 'N/A'
+
+        result_summaries = []
+        for exam_type, label in Examination.EXAM_TYPES:
+            typed_results = [result for result in result_list if result.examination.exam_type == exam_type]
+            count = len(typed_results)
+            average = (
+                sum(float(result.percentage or 0) for result in typed_results) / count
+                if count else 0
+            )
+            result_summaries.append({
+                'label': label,
+                'count': count,
+                'average': average,
+                'best_grade': best_grade_for(typed_results),
+            })
+
+        return {
+            'student': student,
+            'results': result_list,
+            'title': title,
+            'total_exams': total_exams,
+            'passed_exams': passed_exams,
+            'pass_percentage': pass_percentage,
+            'avg_percentage': avg_percentage,
+            'grade_distribution': grade_distribution,
+            'courses': courses,
+            'result_summaries': result_summaries,
+            'overall_best_grade': best_grade_for(result_list),
+        }
+
     # For a specific student (used by admin/faculty)
     if student_id:
         student = get_object_or_404(Student, pk=student_id)
         results = Result.objects.filter(student=student).order_by('-examination__date')
-        context = {
-            'student': student,
-            'results': results,
-            'title': f'Results for {student.name}',
-        }
+        context = build_student_results_context(student, results, f'Results for {student.name}')
         return render(request, 'examination/student_results.html', context)
     
     # For the logged-in student (my results)
@@ -342,11 +396,7 @@ def student_results(request, student_id=None):
         try:
             student = Student.objects.get(user=request.user)
             results = Result.objects.filter(student=student).order_by('-examination__date')
-            context = {
-                'student': student,
-                'results': results,
-                'title': 'My Results',
-            }
+            context = build_student_results_context(student, results, 'My Results')
             return render(request, 'examination/student_results.html', context)
         except Student.DoesNotExist:
             messages.error(request, 'Student profile not found.')

@@ -97,14 +97,8 @@
                             </div>
                             
                             <div class="mb-3">
-                                <h6 class="font-weight-bold">Next Run:</h6>
-                                <p>
-                                    {% if report.next_run %}
-                                    {{ report.next_run|date:"F d, Y H:i" }}
-                                    {% else %}
-                                    <span class="text-muted">Not set</span>
-                                    {% endif %}
-                                </p>
+                                <h6 class="font-weight-bold">Last Run:</h6>
+                                <p>{{ report.last_run|date:"F d, Y H:i"|default:"Not run yet" }}</p>
                             </div>
                             {% endif %}
                         </div>

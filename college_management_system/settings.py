@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Custom apps
-    'user_authentication',
+    'user_authentication.apps.UserAuthenticationConfig',
     'student_management',
     'faculty_management',
     'course_management',

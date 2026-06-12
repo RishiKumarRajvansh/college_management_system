@@ -19,7 +19,6 @@ from user_authentication.models import AuditTrail, UserProfile
 
 import django
 import platform
-import psutil
 import datetime
 
 # Helper function to check if user is admin or superuser
@@ -67,7 +66,8 @@ def home_view(request):
                     context['attendance'] = Attendance.objects.filter(
                         student=student, 
                         date__gte=today - timedelta(days=30)
-                    ).values('status').annotate(count=Count('id'))
+                    # Attendance uses attendance_id as its explicit primary key.
+                    ).values('status').annotate(count=Count('attendance_id'))
                     
                     # Get exam results
                     context['results'] = Result.objects.filter(student=student).order_by('-created_at')[:5]
@@ -79,7 +79,8 @@ def home_view(request):
                     context['book_issues'] = BookIssue.objects.filter(
                         student=student,
                         is_returned=False
-                    ).order_by('due_date')
+                    # BookIssue stores the expected due date as return_date.
+                    ).order_by('return_date')
                     
                     # Get hostel information
                     try:
@@ -105,15 +106,17 @@ def home_view(request):
                     # Get upcoming exams for faculty's courses
                     context['upcoming_exams'] = Examination.objects.filter(
                         course__in=context['courses'],
-                        exam_date__gte=today
-                    ).order_by('exam_date')[:5]
+                        date__date__gte=today
+                    ).order_by('date')[:5]
                     
                     # Get pending result submissions
+                    # Treat past examinations with no result rows as pending; the
+                    # Examination model has no separate completion flag.
                     context['pending_results'] = Examination.objects.filter(
                         course__in=context['courses'],
-                        exam_date__lt=today,
-                        is_completed=False
-                    ).count()
+                        date__date__lt=today,
+                        results__isnull=True,
+                    ).distinct().count()
                     
                 except Faculty.DoesNotExist:
                     pass
@@ -167,9 +170,9 @@ def admin_dashboard(request):
         obtained_marks = results.aggregate(obtained=Sum('marks_obtained'))['obtained'] or 0
         context['average_score'] = round(obtained_marks * 100 / total_marks_possible) if total_marks_possible > 0 else 0
         
-        context['upcoming_exam_count'] = Examination.objects.filter(date__gte=today).count()
+        context['upcoming_exam_count'] = Examination.objects.filter(date__date__gte=today).count()
         # Calculate results pending by checking exams in the past that don't have results
-        past_exams = Examination.objects.filter(date__lt=today)
+        past_exams = Examination.objects.filter(date__date__lt=today)
         results_pending_count = 0
         for exam in past_exams:
             if not Result.objects.filter(examination=exam).exists():
@@ -234,29 +237,7 @@ def admin_dashboard(request):
 @login_required
 @user_passes_test(is_admin)
 def system_activity_logs(request):
-    """View for displaying system activity logs"""
-    # Get all audit trail entries
-    activities = AuditTrail.objects.all().order_by('-action_time')
-    
-    # Apply filters if provided
-    user_filter = request.GET.get('user')
-    if user_filter:
-        activities = activities.filter(user__username__icontains=user_filter)
-        
-    action_filter = request.GET.get('action_type')
-    if action_filter:
-        activities = activities.filter(action_type=action_filter)
-        
-    # Pagination
-    from django.core.paginator import Paginator
-    paginator = Paginator(activities, 50)  # Show 50 items per page
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'activities': page_obj,
-        'users': User.objects.all(),
-        'action_types': AuditTrail.ACTION_TYPES,
-    }
-    
-    return render(request, 'system_activity_logs.html', context)
+    """Compatibility route for the detailed auth activity log page."""
+    from user_authentication.views_activity import system_activity_logs as detailed_activity_logs
+
+    return detailed_activity_logs(request)

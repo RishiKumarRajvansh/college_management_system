@@ -27,7 +27,7 @@
                             <h5>Fee Structure Details:</h5>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item"><strong>Category:</strong> {{ structure.category.name }}</li>
-                                <li class="list-group-item"><strong>Course:</strong> {{ structure.course.course_name }}</li>
+                                <li class="list-group-item"><strong>Course:</strong> {{ structure.course.name }}</li>
                                 <li class="list-group-item"><strong>Academic Year:</strong> {{ structure.academic_year }}</li>
                                 <li class="list-group-item"><strong>Amount:</strong> ${{ structure.amount|floatformat:2 }}</li>
                                 <li class="list-group-item"><strong>Due Date:</strong> {{ structure.due_date|date:"M d, Y" }}</li>

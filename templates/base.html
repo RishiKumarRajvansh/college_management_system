@@ -5,306 +5,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}College Management System{% endblock %}</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">    <!-- Custom CSS -->    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/sidebar-final.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dropdown-fixes.css' %}">
-    <link rel="stylesheet" href="{% static 'css/sidebar-hover-expand.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custom-style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tailwind-compat.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>    <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar (only shown when logged in) -->
-        {% if user.is_authenticated %}
-        <div id="sidebar-wrapper">
-            <div class="sidebar-brand">
-                <a href="{% url 'home' %}">
-                    <span class="sidebar-brand-icon"><i class="fas fa-university"></i></span>
-                    <span class="sidebar-brand-text">College MS</span>
+<body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
+    {% with user_type=user.profile.user_type|default:'' %}
+    {% if user.is_authenticated %}
+    <div class="min-h-screen lg:flex">
+        <div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-slate-950/50 lg:hidden"></div>
+        <aside id="appSidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl transition-transform duration-200 lg:translate-x-0">
+            <div class="flex h-16 items-center gap-3 border-b border-slate-800 px-5">
+                <div class="grid h-10 w-10 place-items-center rounded-xl bg-blue-600 text-white">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div>
+                    <a href="{% url 'home' %}" class="block text-base font-bold tracking-wide text-white">College MS</a>
+                    <span class="text-xs text-slate-400">Management Portal</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 space-y-5 overflow-y-auto px-4 py-5 text-sm">
+                <a href="{% url 'home' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-200 hover:bg-slate-800 hover:text-white">
+                    <i class="fas fa-home w-5 text-blue-300"></i> Dashboard
                 </a>
-            </div>
-            
-            <div class="sidebar-divider"></div>
-            
-            <nav class="sidebar-menu">
-                <ul class="nav flex-column" style="height: auto;">
-                    <li class="nav-item">
-                        <a href="{% url 'home' %}" class="nav-link">
-                            <i class="fas fa-home"></i>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-        {% endif %}
-                    
-                    {% if user.is_authenticated %}
-                        {% if user.profile.user_type == 'admin' or user.is_staff %}
-                            <div class="sidebar-divider"></div>
-                            <div class="sidebar-heading">Administration</div>
-                            
-                            <li class="nav-item dropdown">                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span class="nav-text">Students</span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'student_list' %}">All Students</a>
-                                    <a class="dropdown-item" href="{% url 'student_create' %}">Add Student</a>
-                                </div>
-                            </li>
-                              <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                                    <span class="nav-text">Faculty</span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'faculty_list' %}">All Faculty</a>
-                                    <a class="dropdown-item" href="{% url 'faculty_create' %}">Add Faculty</a>
-                                </div>
-                            </li>
-                              <li class="nav-item">
-                                <a href="{% url 'auth:system_activity_logs' %}" class="nav-link">
-                                    <i class="fas fa-history"></i>
-                                    <span class="nav-text">Activity Logs</span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        
-                        <div class="sidebar-divider"></div>
-                        <div class="sidebar-heading">Academic</div>
-                        
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-book-open"></i>
-                                <span class="nav-text">Courses</span>
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'course_list' %}">All Courses</a>
-                                {% if user.profile.user_type == 'admin' or user.is_staff %}
-                                    <a class="dropdown-item" href="{% url 'course_create' %}">Add Course</a>
-                                {% endif %}
-                            </div>
-                        </li>
-                        
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-calendar-check"></i>
-                                <span class="nav-text">Attendance</span>
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'attendance_list' %}">View Attendance</a>
-                                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'faculty' %}
-                                    <a class="dropdown-item" href="{% url 'attendance_create' %}">Take Attendance</a>
-                                    <a class="dropdown-item" href="{% url 'bulk_attendance' %}">Bulk Attendance</a>
-                                {% endif %}
-                            </div>
-                        </li>
-                        
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-file-alt"></i>
-                                <span class="nav-text">Examinations</span>
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'examination_list' %}">All Exams</a>
-                                <a class="dropdown-item" href="{% url 'result_list' %}">Results</a>
-                                {% if user.profile.user_type == 'admin' or user.profile.user_type == 'faculty' %}
-                                    <a class="dropdown-item" href="{% url 'examination_create' %}">Create Exam</a>
-                                    <a class="dropdown-item" href="{% url 'result_create' %}">Add Results</a>
-                                    <a class="dropdown-item" href="{% url 'result_create' %}">Bulk Result Entry</a>
-                                {% endif %}
-                            </div>
-                        </li>
-                        
-                        <div class="sidebar-divider"></div>
-                        <div class="sidebar-heading">Campus Services</div>
-                          <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-book"></i>
-                                <span class="nav-text">Library</span>
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'library_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'book_list' %}">All Books</a>
-                                <a class="dropdown-item" href="{% url 'book_issue_list' %}">Book Issues</a>
-                                {% if user.profile.user_type == 'admin' %}
-                                    <a class="dropdown-item" href="{% url 'book_create' %}">Add Book</a>
-                                    <a class="dropdown-item" href="{% url 'book_issue_create' %}">Issue Book</a>
-                                {% endif %}
-                            </div>
-                        </li>
-                        
-                        {% if user.profile.user_type == 'admin' %}                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <i class="fas fa-home"></i>
-                                    <span class="nav-text">Hostel</span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'hostel_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{% url 'hostel_list' %}">All Hostels</a>
-                                    <a class="dropdown-item" href="{% url 'room_list' %}">All Rooms</a>
-                                    <a class="dropdown-item" href="{% url 'allocation_list' %}">Room Allocations</a>
-                                    <a class="dropdown-item" href="{% url 'hostel_create' %}">Add Hostel</a>
-                                    <a class="dropdown-item" href="{% url 'room_create' %}">Add Room</a>
-                                    <a class="dropdown-item" href="{% url 'allocation_create' %}">Allocate Room</a>
-                                </div>
-                            </li>
-                              <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <i class="fas fa-money-bill"></i>
-                                    <span class="nav-text">Fees</span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'fee_dashboard' %}"><i class="fas fa-chart-line me-2"></i>Dashboard</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{% url 'fee_category_list' %}">Fee Categories</a>
-                                    <a class="dropdown-item" href="{% url 'fee_structure_list' %}">Fee Structure</a>
-                                    <a class="dropdown-item" href="{% url 'payment_list' %}">Payments</a>
-                                    <a class="dropdown-item" href="{% url 'fee_category_create' %}">Add Fee Category</a>
-                                    <a class="dropdown-item" href="{% url 'fee_structure_create' %}">Add Fee Structure</a>
-                                    <a class="dropdown-item" href="{% url 'payment_create' %}">Add Payment</a>
-                                </div>
-                            </li>
-                            
-                            <div class="sidebar-divider"></div>
-                            <div class="sidebar-heading">Reporting</div>
-                            
-                            <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                    <i class="fas fa-chart-bar"></i>
-                                    <span class="nav-text">Reports</span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'reporting_dashboard' %}">Dashboard</a>
-                                    <a class="dropdown-item" href="{% url 'report_list' %}">All Reports</a>
-                                    <a class="dropdown-item" href="{% url 'student_report' %}">Student Reports</a>
-                                    <a class="dropdown-item" href="{% url 'faculty_report' %}">Faculty Reports</a>
-                                    <a class="dropdown-item" href="{% url 'attendance_report' %}">Attendance Reports</a>
-                                    <a class="dropdown-item" href="{% url 'examination_report' %}">Examination Reports</a>
-                                    <a class="dropdown-item" href="{% url 'fee_report' %}">Fee Reports</a>
-                                </div>
-                            </li>                            <div class="sidebar-divider"></div>
-                            <div class="sidebar-heading">System</div>
-                            
-                            <li class="nav-item">
-                                <a href="{% url 'admin_reset_requests' %}" class="nav-link">
-                                    <i class="fas fa-key"></i>
-                                    <span class="nav-text">Password Reset Requests</span>
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
-            </nav>
-            
-            <div class="sidebar-divider mt-3"></div>
-            
-            <!-- Sidebar Footer -->
-            <div class="text-center p-3 mt-auto">
-                {% if user.is_authenticated %}
-                    <small class="text-light">Logged in as: {{ user.username }}</small>
+
+                {% if user_type == 'admin' or user.is_staff %}
+                <section>
+                    <p class="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Administration</p>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-user-graduate mr-3 w-5 text-blue-300"></i>Students</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'student_list' %}">All Students</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'student_create' %}">Add Student</a>
+                        </div>
+                    </details>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-chalkboard-teacher mr-3 w-5 text-blue-300"></i>Faculty</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'faculty_list' %}">All Faculty</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'faculty_create' %}">Add Faculty</a>
+                        </div>
+                    </details>
+                    <a href="{% url 'auth:system_activity_logs' %}" class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-200 hover:bg-slate-800 hover:text-white">
+                        <i class="fas fa-history w-5 text-blue-300"></i> Activity Logs
+                    </a>
+                </section>
                 {% endif %}
+
+                <section>
+                    <p class="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Academic</p>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-book-open mr-3 w-5 text-blue-300"></i>Courses</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'course_list' %}">All Courses</a>
+                            {% if user_type == 'admin' or user.is_staff %}
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'course_create' %}">Add Course</a>
+                            {% endif %}
+                        </div>
+                    </details>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-calendar-check mr-3 w-5 text-blue-300"></i>Attendance</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'attendance_list' %}">View Attendance</a>
+                            {% if user_type == 'admin' or user_type == 'faculty' %}
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'attendance_create' %}">Take Attendance</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'bulk_attendance' %}">Bulk Attendance</a>
+                            {% endif %}
+                        </div>
+                    </details>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-file-alt mr-3 w-5 text-blue-300"></i>Examinations</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'examination_list' %}">All Exams</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'result_list' %}">Results</a>
+                            {% if user_type == 'admin' or user_type == 'faculty' %}
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'examination_create' %}">Create Exam</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'result_create' %}">Add Results</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'bulk_result_create' %}">Bulk Result Entry</a>
+                            {% endif %}
+                        </div>
+                    </details>
+                </section>
+
+                <section>
+                    <p class="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Campus Services</p>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-book mr-3 w-5 text-blue-300"></i>Library</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'library_dashboard' %}">Dashboard</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'book_list' %}">All Books</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'book_issue_list' %}">Book Issues</a>
+                            {% if user_type == 'admin' %}
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'book_create' %}">Add Book</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'book_issue_create' %}">Issue Book</a>
+                            {% endif %}
+                        </div>
+                    </details>
+                    {% if user_type == 'admin' %}
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-home mr-3 w-5 text-blue-300"></i>Hostel</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'hostel_dashboard' %}">Dashboard</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'hostel_list' %}">All Hostels</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'room_list' %}">All Rooms</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'allocation_list' %}">Room Allocations</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'hostel_create' %}">Add Hostel</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'room_create' %}">Add Room</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'allocation_create' %}">Allocate Room</a>
+                        </div>
+                    </details>
+                    <details class="group">
+                        <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-semibold hover:bg-slate-800">
+                            <span><i class="fas fa-money-bill mr-3 w-5 text-blue-300"></i>Fees</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-500 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="mt-1 space-y-1 pl-10">
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'fee_dashboard' %}">Dashboard</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'fee_category_list' %}">Fee Categories</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'fee_structure_list' %}">Fee Structure</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'payment_list' %}">Payments</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'fee_category_create' %}">Add Fee Category</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'fee_structure_create' %}">Add Fee Structure</a>
+                            <a class="block rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white" href="{% url 'payment_create' %}">Add Payment</a>
+                        </div>
+                    </details>
+                    <p class="px-3 pb-2 pt-4 text-xs font-bold uppercase tracking-wider text-slate-500">Reporting</p>
+                    <a class="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-200 hover:bg-slate-800 hover:text-white" href="{% url 'reporting_dashboard' %}">
+                        <i class="fas fa-chart-bar w-5 text-blue-300"></i> Reports Dashboard
+                    </a>
+                    <a class="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-200 hover:bg-slate-800 hover:text-white" href="{% url 'report_list' %}">
+                        <i class="fas fa-file-alt w-5 text-blue-300"></i> All Reports
+                    </a>
+                    <a class="flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold text-slate-200 hover:bg-slate-800 hover:text-white" href="{% url 'auth:admin_reset_requests' %}">
+                        <i class="fas fa-key w-5 text-blue-300"></i> Password Reset Requests
+                    </a>
+                    {% endif %}
+                </section>
+            </nav>
+
+            <div class="border-t border-slate-800 p-4 text-xs text-slate-400">
+                Signed in as
+                <span class="block truncate font-semibold text-slate-200">{{ user.email|default:user.username }}</span>
             </div>
-        </div>
-          <!-- Content Wrapper -->
-        <div id="content-wrapper" {% if not user.is_authenticated %}class="full-width"{% endif %}>
-            <!-- Top Navbar -->
-            <div id="navbar-wrapper">
-                <div id="navbar" class="container-fluid">
-                    {% if user.is_authenticated %}
-                    <button id="sidebarToggle" class="sidebar-toggle" data-bs-toggle="tooltip" data-bs-placement="right" title="Toggle Sidebar">
+        </aside>
+
+        <div class="flex min-h-screen w-full flex-col lg:pl-72">
+            <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+                <div class="flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+                    <button id="sidebarToggle" type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm lg:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    {% else %}
-                    <div class="navbar-brand">
-                        <i class="fas fa-university me-2"></i>
-                        College Management System
+                    <div class="min-w-0">
+                        <p class="truncate text-sm font-semibold text-slate-500">College Management System</p>
+                        <h1 class="truncate text-lg font-bold text-slate-900">{% block page_heading %}Dashboard{% endblock %}</h1>
                     </div>
-                    {% endif %}
-                      <div class="navbar-user">
-                        {% if user.is_authenticated %}                            <!-- Notifications Dropdown -->
-                            <div class="dropdown d-inline-block me-3">                                <a href="#" class="position-relative text-decoration-none notification-icon" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-bell fa-lg"></i>
-                                    <span id="notificationCounter" class="notification-badge badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.65rem; padding: 0.25rem 0.4rem;"></span>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationsDropdown" style="width: 360px; max-height: 400px; overflow-y: auto;">
-                                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                                        <h6 class="m-0">Notifications</h6>
-                                        <button class="btn btn-sm btn-link" id="markAllReadDropdown">Mark all read</button>
-                                    </div>
-                                    <div class="notification-list p-2" id="notificationDropdownContainer">
-                                        <div class="text-center py-3">
-                                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="border-top p-2 text-center">
-                                        <a href="{% url 'reporting_dashboard' %}" class="text-decoration-none">View All</a>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- User Dropdown -->
-                            <div class="dropdown">
-                                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user-circle fa-lg me-2"></i>
-                                    <span>{{ user.username }}</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'auth:profile' %}">My Profile</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'auth:change_password' %}">Change Password</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form id="logout-form" action="{% url 'auth:logout' %}" method="post" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="dropdown-item">Logout</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <div id="main-content" class="container-fluid">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="dropdown">
+                        <button class="grid h-10 w-10 place-items-center rounded-full bg-blue-600 text-white" data-bs-toggle="dropdown" type="button">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="{% url 'auth:profile' %}">My Profile</a>
+                            <a class="dropdown-item" href="{% url 'auth:change_password' %}">Change Password</a>
+                            <div class="dropdown-divider"></div>
+                            <form action="{% url 'auth:logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item w-100 text-start">Logout</button>
+                            </form>
                         </div>
-                    {% endfor %}
-                {% endif %}
-                
-                {% block content %}{% endblock %}            </div>
-            
-            <!-- Footer -->
-            <footer class="bg-dark text-white text-center py-3 mt-5">
-                <div class="container">
-                    <p class="mb-0">&copy; {% now 'Y' %} College Management System. All rights reserved.</p>
+                    </div>
                 </div>
+            </header>
+            <main class="flex-1 px-4 py-5 sm:px-6 lg:px-8">
+    {% else %}
+    <div class="min-h-screen bg-slate-100">
+        <header class="border-b border-slate-200 bg-white">
+            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <a href="{% url 'home' %}" class="flex items-center gap-3 font-bold text-slate-900">
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-blue-600 text-white">
+                        <i class="fas fa-university"></i>
+                    </span>
+                    College Management System
+                </a>
+                <a href="{% url 'login' %}" class="rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50">Login</a>
+            </div>
+        </header>
+        <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    {% endif %}
+
+            {% if messages %}
+            <div class="mb-4 space-y-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+
+    {% if user.is_authenticated %}
+            </main>
+            <footer class="border-t border-slate-200 bg-white px-4 py-4 text-center text-sm text-slate-500">
+                &copy; {% now 'Y' %} College Management System. All rights reserved.
             </footer>
         </div>
     </div>
-    
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    <!-- Custom JavaScript -->    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/sidebar-dropdown-fix.js' %}"></script>
-    <script src="{% static 'js/sidebar-hover-expand.js' %}"></script>
+    {% else %}
+        </main>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/common.js' %}"></script>
     {% if user.is_authenticated %}
     <script src="{% static 'js/notifications.js' %}"></script>
     {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('appSidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const openSidebar = () => {
+                sidebar && sidebar.classList.remove('-translate-x-full');
+                backdrop && backdrop.classList.remove('hidden');
+            };
+            const closeSidebar = () => {
+                sidebar && sidebar.classList.add('-translate-x-full');
+                backdrop && backdrop.classList.add('hidden');
+            };
+            toggle && toggle.addEventListener('click', openSidebar);
+            backdrop && backdrop.addEventListener('click', closeSidebar);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -27,7 +27,7 @@ class FeeStructure(models.Model):
         unique_together = ('category', 'course', 'academic_year')
     
     def __str__(self):
-        return f"{self.category.name} - {self.course.course_name} - {self.academic_year} - ${self.amount}"
+        return f"{self.category.name} - {self.course.name} - {self.academic_year} - ${self.amount}"
 
 class Payment(models.Model):
     PAYMENT_STATUS = (

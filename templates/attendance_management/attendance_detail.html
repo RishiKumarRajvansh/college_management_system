@@ -43,7 +43,7 @@
             <div class="row mb-3">
                 <div class="col-md-4 fw-bold">Course:</div>
                 <div class="col-md-8">
-                    <a href="{% url 'course_detail' attendance.course.course_id %}">{{ attendance.course.course_name }}</a>
+                    <a href="{% url 'course_detail' attendance.course.course_id %}">{{ attendance.course.name }}</a>
                 </div>
             </div>
             <div class="row mb-3">
@@ -110,7 +110,7 @@
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-4 fw-bold">Course Name:</div>
-                        <div class="col-md-8">{{ attendance.course.course_name }}</div>
+                        <div class="col-md-8">{{ attendance.course.name }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-md-4 fw-bold">Faculty:</div>

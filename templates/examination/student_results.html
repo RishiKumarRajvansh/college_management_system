@@ -15,7 +15,7 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>Academic Record: {{ student.name }}</h2>
-            <p class="text-muted">Student ID: {{ student.student_id }} | Course: {{ student.course.course_name }} | Year: {{ student.year }}</p>
+            <p class="text-muted">Student ID: {{ student.student_id }} | Course: {{ student.course.name }} | Year: {{ student.year }}</p>
         </div>
         <div class="col-md-4 text-end">
             <a href="javascript:window.print();" class="btn btn-info">
@@ -34,7 +34,7 @@
                 <div class="card-body text-center">
                     <img src="https://ui-avatars.com/api/?name={{ student.name|urlencode }}&size=128&background=random" class="rounded-circle img-thumbnail mb-3" alt="{{ student.name }}">
                     <h4>{{ student.name }}</h4>
-                    <p class="text-muted mb-1">{{ student.course.course_name }}</p>
+                    <p class="text-muted mb-1">{{ student.course.name }}</p>
                     <p class="text-muted">Year: {{ student.year }}</p>
                     <hr>
                     <div class="text-start">
@@ -87,7 +87,6 @@
                     <!-- Grade Distribution -->
                     <h6>Grade Distribution</h6>
                     <div class="row text-center small">
-                        {% with grade_counts=results|regroup_by:'grade' %}
                         {% for grade, count in grade_distribution.items %}
                         <div class="col-3 mb-2">
                             <div class="border rounded p-1">
@@ -103,7 +102,6 @@
                             </div>
                         </div>
                         {% endfor %}
-                        {% endwith %}
                     </div>
                 </div>
             </div>
@@ -147,7 +145,7 @@
                                             <td>{{ result.examination.date|date:"M d, Y" }}</td>
                                             <td>{{ result.examination.exam_name }}</td>
                                             <td>{{ result.examination.get_exam_type_display }}</td>
-                                            <td>{{ result.examination.course.course_name }}</td>
+                                            <td>{{ result.examination.course.name }}</td>
                                             <td>{{ result.marks_obtained }} / {{ result.examination.total_marks }}</td>
                                             <td>
                                                 {% if result.grade == 'A+' %}<span class="badge bg-success">A+</span>
@@ -266,57 +264,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% with midterms=results|filter_by:"examination.exam_type,midterm" %}
+                                {% for summary in result_summaries %}
                                 <tr>
-                                    <td>Mid Term</td>
-                                    <td>{{ midterms|length }}</td>
-                                    <td>{{ midterms|average:"percentage"|floatformat:2 }}%</td>
-                                    <td>{{ midterms|best_grade }}</td>
+                                    <td>{{ summary.label }}</td>
+                                    <td>{{ summary.count }}</td>
+                                    <td>{{ summary.average|floatformat:2 }}%</td>
+                                    <td>{{ summary.best_grade }}</td>
                                 </tr>
-                                {% endwith %}
-                                
-                                {% with finals=results|filter_by:"examination.exam_type,final" %}
-                                <tr>
-                                    <td>Final Exam</td>
-                                    <td>{{ finals|length }}</td>
-                                    <td>{{ finals|average:"percentage"|floatformat:2 }}%</td>
-                                    <td>{{ finals|best_grade }}</td>
-                                </tr>
-                                {% endwith %}
-                                
-                                {% with quizzes=results|filter_by:"examination.exam_type,quiz" %}
-                                <tr>
-                                    <td>Quizzes</td>
-                                    <td>{{ quizzes|length }}</td>
-                                    <td>{{ quizzes|average:"percentage"|floatformat:2 }}%</td>
-                                    <td>{{ quizzes|best_grade }}</td>
-                                </tr>
-                                {% endwith %}
-                                
-                                {% with assignments=results|filter_by:"examination.exam_type,assignment" %}
-                                <tr>
-                                    <td>Assignments</td>
-                                    <td>{{ assignments|length }}</td>
-                                    <td>{{ assignments|average:"percentage"|floatformat:2 }}%</td>
-                                    <td>{{ assignments|best_grade }}</td>
-                                </tr>
-                                {% endwith %}
-                                
-                                {% with projects=results|filter_by:"examination.exam_type,project" %}
-                                <tr>
-                                    <td>Projects</td>
-                                    <td>{{ projects|length }}</td>
-                                    <td>{{ projects|average:"percentage"|floatformat:2 }}%</td>
-                                    <td>{{ projects|best_grade }}</td>
-                                </tr>
-                                {% endwith %}
+                                {% endfor %}
                             </tbody>
                             <tfoot class="table-primary">
                                 <tr>
                                     <th>Overall</th>
                                     <th>{{ total_exams }}</th>
                                     <th>{{ avg_percentage|floatformat:2 }}%</th>
-                                    <th>{{ results|best_grade }}</th>
+                                    <th>{{ overall_best_grade }}</th>
                                 </tr>
                             </tfoot>
                         </table>

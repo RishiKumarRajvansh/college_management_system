@@ -126,6 +126,10 @@
                     <tbody>
                         {% for report in reports %}
                         <tr>
+                            <td>
+                                <span class="report-status {% if report.is_scheduled %}status-scheduled{% else %}status-complete{% endif %}"></span>
+                                {% if report.is_scheduled %}Scheduled{% else %}Complete{% endif %}
+                            </td>
                             <td>{{ report.report_id }}</td>
                             <td>{{ report.title }}</td>
                             <td>{{ report.get_report_type_display }}</td>
@@ -156,7 +160,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center">No reports found.</td>
+                            <td colspan="8" class="text-center">No reports found.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -232,7 +236,6 @@
             allowInput: true,
             altInput: true,
             altFormat: "F j, Y"
-        });
         });
     });
 </script>

@@ -3,73 +3,123 @@
 
 {% block title %}Login - College Management System{% endblock %}
 
+{% block extra_css %}
+<style>
+    @media (max-width: 640px) {
+        .login-card {
+            width: calc(100vw - 2rem) !important;
+            max-width: calc(100vw - 2rem) !important;
+        }
+
+        .login-card input,
+        .login-card button[type="submit"] {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="login-container">
-            <div class="card login-card">
-                <div class="login-header">
-                    <h1 class="text-center mb-0"><i class="fas fa-university me-2"></i>CMS</h1>
-                    <p class="mt-2 mb-0">College Management System</p>
-                </div>
-                <div class="card-body p-4">
-                    <h4 class="card-title text-center mb-4">Login to your account</h4>
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.username.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
-                            <div class="input-group">
-                                {{ form.password }}
-                                <button class="btn btn-outline-secondary toggle-password" type="button" toggle="#id_password">
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.password.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.password.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember-me">
-                            <label class="form-check-label" for="remember-me">Remember me</label>
-                        </div>
-                        
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                          <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Login</button>
-                            <a href="{% url 'auth:password_reset' %}" class="btn btn-link text-center">Forgot password?</a>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="card-footer text-center py-3">
-                    <p class="mb-0">Don't have an account? <a href="{% url 'auth:register' %}" class="text-primary">Register</a></p>
-                </div>
+<div class="login-card mx-auto grid w-full overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200 lg:grid-cols-2" style="max-width: min(64rem, calc(100vw - 2rem));">
+    <div class="hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+        <div>
+            <div class="mb-8 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
+                <i class="fas fa-university text-xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight text-white">College Management System</h1>
+            <p class="mt-4 max-w-sm text-sm leading-6 text-slate-300">
+                Manage students, faculty, courses, attendance, fees, library operations, hostel allocations, and reports from one responsive portal.
+            </p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 text-sm text-slate-300">
+            <div class="rounded-xl border border-slate-800 p-4">
+                <i class="fas fa-user-shield mb-3 text-blue-300"></i>
+                <p class="font-semibold text-white">Role based</p>
+                <p class="mt-1 text-xs">Admin, faculty, and student views.</p>
+            </div>
+            <div class="rounded-xl border border-slate-800 p-4">
+                <i class="fas fa-mobile-screen mb-3 text-blue-300"></i>
+                <p class="font-semibold text-white">Responsive</p>
+                <p class="mt-1 text-xs">Usable across desktop and mobile.</p>
             </div>
         </div>
     </div>
+
+    <div class="p-6 sm:p-10">
+        <div class="mb-8 lg:hidden">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white">
+                <i class="fas fa-university text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900">College MS</h1>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">Sign in</h2>
+            <p class="mt-2 text-sm text-slate-500">Use your registered email address and password.</p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.username.id_for_label }}" class="form-label">Email address</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="mt-2 text-sm text-red-600">
+                    {% for error in form.username.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                <div class="relative">
+                    {{ form.password }}
+                    <button class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-slate-500 hover:text-slate-900" type="button" id="togglePassword" aria-label="Show password">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                <div class="mt-2 text-sm text-red-600">
+                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary w-100 py-3">
+                <i class="fas fa-right-to-bracket"></i>
+                Sign in
+            </button>
+        </form>
+
+        <div class="mt-6 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <a href="{% url 'auth:password_reset' %}" class="font-semibold text-blue-600 hover:text-blue-700">Forgot password?</a>
+            <span class="text-slate-500">
+                No account?
+                <a href="{% url 'auth:register' %}" class="font-semibold text-blue-600 hover:text-blue-700">Register</a>
+            </span>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const button = document.getElementById('togglePassword');
+        const input = document.getElementById('id_password');
+        if (!button || !input) return;
+        button.addEventListener('click', function () {
+            input.type = input.type === 'password' ? 'text' : 'password';
+            button.querySelector('i').classList.toggle('fa-eye');
+            button.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
 {% endblock %}

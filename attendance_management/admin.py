@@ -5,6 +5,6 @@ from .models import Attendance
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('attendance_id', 'student', 'course', 'date', 'status')
     list_filter = ('date', 'status', 'course')
-    search_fields = ('student__name', 'course__course_name')
+    search_fields = ('student__name', 'course__name', 'course__code')
     ordering = ('-date',)
     date_hierarchy = 'date'

@@ -12,8 +12,8 @@ import json
 
 # Import for export functionality
 import csv
-import xlwt
 import tempfile
+from openpyxl import Workbook
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -89,7 +89,7 @@ def exam_performance(request):
             pass_rate = (pass_count / total_count * 100) if total_count > 0 else 0
             
             # Add to lists
-            courses.append(course.course_name)
+            courses.append(course.name)
             average_scores.append(round(average_percentage, 1))
             pass_rates.append(round(pass_rate, 1))
     
@@ -292,15 +292,13 @@ def _get_report_data(report):
     
     if report_type == 'student':
         students = Student.objects.all()
-        headers = ['ID', 'Name', 'Gender', 'Date of Birth', 'Email', 'Phone', 'Address']
+        headers = ['ID', 'Name', 'Email', 'Course', 'Year']
         rows = [[
-            s.student_id,
-            f"{s.first_name} {s.last_name}",
-            s.gender,
-            s.date_of_birth.strftime('%Y-%m-%d') if s.date_of_birth else 'N/A',
+            s.formatted_id,
+            s.name,
             s.email,
-            s.phone,
-            s.address
+            s.course.name,
+            s.year,
         ] for s in students]
         return {'headers': headers, 'rows': rows}
     
@@ -316,8 +314,8 @@ def _get_report_data(report):
         
         headers = ['Student ID', 'Student Name', 'Date', 'Status']
         rows = [[
-            a.student.student_id,
-            f"{a.student.first_name} {a.student.last_name}",
+            a.student.formatted_id,
+            a.student.name,
             a.date.strftime('%Y-%m-%d'),
             a.status.capitalize()
         ] for a in attendances]
@@ -328,11 +326,11 @@ def _get_report_data(report):
         
         headers = ['Student ID', 'Student Name', 'Exam', 'Course', 'Score', 'Percentage', 'Status']
         rows = [[
-            r.student.student_id,
-            f"{r.student.first_name} {r.student.last_name}",
+            r.student.formatted_id,
+            r.student.name,
             r.examination.exam_name,
-            r.examination.course.course_name,
-            r.score,
+            r.examination.course.name,
+            r.marks_obtained,
             r.percentage,
             r.status.capitalize()
         ] for r in results]
@@ -344,8 +342,8 @@ def _get_report_data(report):
         headers = ['Receipt No', 'Student ID', 'Student Name', 'Amount', 'Payment Date', 'Payment Method']
         rows = [[
             p.receipt_number,
-            p.student.student_id,
-            f"{p.student.first_name} {p.student.last_name}",
+            p.student.formatted_id,
+            p.student.name,
             p.amount,
             p.payment_date.strftime('%Y-%m-%d'),
             p.payment_method.capitalize()
@@ -369,25 +367,20 @@ def _export_as_csv(report, data):
 
 def _export_as_excel(report, data):
     """Export report data as Excel file"""
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'attachment; filename="{report.report_type}_report_{datetime.date.today().strftime("%Y%m%d")}.xls"'
-    
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet(report.report_type.capitalize())
-    
-    # Write header row
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-    
-    for col_num, header in enumerate(data['headers']):
-        ws.write(0, col_num, header, font_style)
-    
-    # Write data rows
-    font_style = xlwt.XFStyle()
-    for row_num, row_data in enumerate(data['rows']):
-        for col_num, cell_value in enumerate(row_data):
-            ws.write(row_num + 1, col_num, str(cell_value), font_style)
-    
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{report.report_type}_report_{datetime.date.today().strftime("%Y%m%d")}.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = report.report_type.capitalize()[:31]
+
+    # openpyxl is already a project dependency and avoids the missing xlwt import.
+    ws.append(data['headers'])
+    for row_data in data['rows']:
+        ws.append([str(cell_value) for cell_value in row_data])
+
     wb.save(response)
     return response
 

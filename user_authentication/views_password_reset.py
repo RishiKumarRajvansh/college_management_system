@@ -62,7 +62,7 @@ def request_password_reset(request):
     else:
         form = PasswordResetRequestForm()
     
-    return render(request, 'user_authentication/password_reset_request.html', {'form': form})
+    return render(request, 'user_authentication/password_reset.html', {'form': form})
 
 @login_required
 @user_passes_test(is_admin)

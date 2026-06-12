@@ -72,7 +72,7 @@
                             <td>{{ student.formatted_id }}</td>
                             <td>{{ student.name }}</td>
                             <td>{{ student.email }}</td>
-                            <td>{{ student.course.course_name }}</td>
+                            <td>{{ student.course.name }}</td>
                             <td>{{ student.year }}</td>
                             <td>
                                 <a href="{% url 'student_detail' student.student_id %}" class="btn btn-sm btn-info">

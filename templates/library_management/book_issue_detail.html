@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Issue Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-exchange-alt text-primary me-2"></i>
+            Book Issue Details
+        </h1>
+        <div>
+            {% if not issue.is_returned %}
+            <a href="{% url 'book_return' issue.issue_id %}" class="btn btn-success">
+                <i class="fas fa-undo me-2"></i>Return Book
+            </a>
+            {% endif %}
+            <a href="{% url 'book_issue_update' issue.issue_id %}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit
+            </a>
+            <a href="{% url 'book_issue_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Issue Record</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width: 25%">Student</th>
+                        <td>
+                            <a href="{% url 'student_detail' issue.student.student_id %}">
+                                {{ issue.student.name }} ({{ issue.student.formatted_id }})
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Book</th>
+                        <td>
+                            <a href="{% url 'book_detail' issue.book.book_id %}">
+                                {{ issue.book.title }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Issue Date</th>
+                        <td>{{ issue.issue_date|date:"M d, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Return By</th>
+                        <td>{{ issue.return_date|date:"M d, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Actual Return Date</th>
+                        <td>{{ issue.actual_return_date|date:"M d, Y"|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fine Amount</th>
+                        <td>${{ issue.fine_amount|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            {% if issue.is_returned %}
+                            <span class="badge bg-success">Returned</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Issued</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

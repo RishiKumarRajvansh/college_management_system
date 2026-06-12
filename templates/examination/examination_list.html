@@ -84,7 +84,7 @@
                                 <tr>
                                     <td>{{ exam.exam_id }}</td>
                                     <td>{{ exam.exam_name }}</td>
-                                    <td>{{ exam.course.course_name }}</td>
+                                    <td>{{ exam.course.name }}</td>
                                     <td><span class="badge bg-primary">{{ exam.get_exam_type_display }}</span></td>
                                     <td>{{ exam.date|date:"M d, Y H:i" }}</td>
                                     <td>
@@ -170,7 +170,7 @@
                                 <h6 class="mb-1">{{ exam.exam_name }}</h6>
                                 <small>{{ exam.date|date:"M d, Y" }}</small>
                             </div>
-                            <p class="mb-1">{{ exam.course.course_name }}</p>
+                            <p class="mb-1">{{ exam.course.name }}</p>
                             <small class="text-muted">
                                 <span class="badge bg-primary">{{ exam.get_exam_type_display }}</span>
                                 {{ exam.date|date:"H:i" }} | {{ exam.duration }} minutes

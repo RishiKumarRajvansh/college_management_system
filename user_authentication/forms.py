@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
 from .models import UserProfile, PasswordResetRequest
@@ -6,14 +7,52 @@ import random
 import string
 
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={
+    error_messages = {
+        'invalid_login': "Please enter a correct email and password. Passwords are case-sensitive.",
+        'inactive': "This account is inactive.",
+    }
+
+    username = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Username',
+        'placeholder': 'Email address',
+        'autocomplete': 'email',
     }))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'placeholder': 'Password',
+        'autocomplete': 'current-password',
     }))
+
+    def clean(self):
+        email = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if email is not None and password:
+            users = User.objects.filter(email__iexact=email, is_active=True)
+            # Django's password hash check is case-sensitive; pass the exact
+            # password string through without normalization.
+            matching_users = []
+            for user in users:
+                authenticated_user = authenticate(
+                    self.request,
+                    username=user.get_username(),
+                    password=password,
+                )
+                if authenticated_user is not None:
+                    matching_users.append(authenticated_user)
+
+            if not matching_users:
+                raise self.get_invalid_login_error()
+            if len(matching_users) > 1:
+                raise forms.ValidationError(
+                    "Multiple active accounts match this email and password. Please contact an administrator.",
+                    code='duplicate_email_password',
+                )
+
+            self.user_cache = matching_users[0]
+            self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 class UserRegistrationForm(UserCreationForm):
     USER_TYPES = (

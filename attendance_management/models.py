@@ -20,4 +20,4 @@ class Attendance(models.Model):
         unique_together = ('student', 'course', 'date')
 
     def __str__(self):
-        return f"{self.student.name} - {self.course.course_name} - {self.date} - {self.status}"
+        return f"{self.student.name} - {self.course.name} - {self.date} - {self.status}"

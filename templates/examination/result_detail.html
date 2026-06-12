@@ -45,7 +45,7 @@
                                 <hr>
                                 <p><strong>Name:</strong> {{ result.student.name }}</p>
                                 <p><strong>ID:</strong> {{ result.student.student_id }}</p>
-                                <p><strong>Course:</strong> {{ result.student.course.course_name }}</p>
+                                <p><strong>Course:</strong> {{ result.student.course.name }}</p>
                                 <p><strong>Year:</strong> {{ result.student.year }}</p>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                                 <p><strong>Exam Name:</strong> {{ result.examination.exam_name }}</p>
                                 <p><strong>Type:</strong> {{ result.examination.get_exam_type_display }}</p>
                                 <p><strong>Date:</strong> {{ result.examination.date|date:"F d, Y" }}</p>
-                                <p><strong>Course:</strong> {{ result.examination.course.course_name }}</p>
+                                <p><strong>Course:</strong> {{ result.examination.course.name }}</p>
                             </div>
                         </div>
                     </div>

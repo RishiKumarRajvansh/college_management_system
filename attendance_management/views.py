@@ -172,4 +172,31 @@ def student_attendance(request, student_id):
     stats = {}
     for course in student.course.all() if hasattr(student, 'course') and hasattr(student.course, 'all') else [student.course]:
         course_attendances = attendances.filter(course=course)
-        total = course_attendances.count
+        total = course_attendances.count()
+        present = course_attendances.filter(status='present').count()
+        absent = course_attendances.filter(status='absent').count()
+        late = course_attendances.filter(status='late').count()
+        excused = course_attendances.filter(status='excused').count()
+
+        # Keep division safe for students who do not have attendance records yet.
+        stats[course.name] = {
+            'total': total,
+            'present': present,
+            'absent': absent,
+            'late': late,
+            'excused': excused,
+            'present_percentage': round((present / total) * 100, 2) if total else 0,
+            'absent_percentage': round((absent / total) * 100, 2) if total else 0,
+            'late_percentage': round((late / total) * 100, 2) if total else 0,
+            'excused_percentage': round((excused / total) * 100, 2) if total else 0,
+        }
+
+    paginator = Paginator(attendances, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'attendance_management/student_attendance.html', {
+        'student': student,
+        'stats': stats,
+        'page_obj': page_obj,
+        'total_attendances': attendances.count(),
+    })

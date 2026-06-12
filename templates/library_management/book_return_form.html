@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Return Book{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Return Book</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>{{ issue.book.title }}</strong> issued to {{ issue.student.name }}.
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.actual_return_date.id_for_label }}" class="form-label">Actual Return Date</label>
+                            {{ form.actual_return_date }}
+                            {% if form.actual_return_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.actual_return_date.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.fine_amount.id_for_label }}" class="form-label">Fine Amount</label>
+                            {{ form.fine_amount }}
+                            {% if form.fine_amount.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.fine_amount.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'book_issue_detail' issue.issue_id %}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i>Mark Returned
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

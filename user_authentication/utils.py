@@ -14,7 +14,11 @@ def get_relevant_activities(user, limit=10):
     """
     if not user.is_authenticated:
         return AuditTrail.objects.none()
-        
+
+    if user.is_superuser:
+        activities = AuditTrail.objects.all().order_by('-action_time')
+        return activities[:limit] if limit else activities
+
     # Get user profile
     profile = getattr(user, 'profile', None)
     if not profile:

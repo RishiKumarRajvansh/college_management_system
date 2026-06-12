@@ -78,7 +78,7 @@
                                 {% if fee_structures %}
                                     {% for structure in fee_structures %}
                                     <tr>
-                                        <td>{{ structure.course.course_name }}</td>
+                                        <td>{{ structure.course.name }}</td>
                                         <td>{{ structure.academic_year }}</td>
                                         <td>${{ structure.amount|floatformat:2 }}</td>
                                         <td>{{ structure.due_date|date:"M d, Y" }}</td>

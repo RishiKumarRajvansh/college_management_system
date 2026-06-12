@@ -138,12 +138,20 @@ def profile(request):
 
 @login_required
 def edit_profile(request):
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'user_type': 'admin' if request.user.is_staff or request.user.is_superuser else 'student',
+            'is_first_login': False,
+        }
+    )
+
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(
             request.POST, 
             request.FILES, 
-            instance=request.user.profile
+            instance=profile
         )
         
         if user_form.is_valid() and profile_form.is_valid():
@@ -164,7 +172,7 @@ def edit_profile(request):
             return redirect('auth:profile')
     else:
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=request.user.profile)
+        profile_form = UserProfileForm(instance=profile)
     
     context = {
         'user_form': user_form,

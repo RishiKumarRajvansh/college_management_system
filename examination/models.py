@@ -25,7 +25,7 @@ class Examination(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f"{self.exam_name} - {self.course.course_name}"
+        return f"{self.exam_name} - {self.course.name}"
 
 class Result(models.Model):
     GRADE_CHOICES = (
@@ -83,6 +83,7 @@ class Result(models.Model):
                 self.grade = 'C'
             elif self.percentage >= 33:
                 self.grade = 'D'
-            else:                self.grade = 'F'
+            else:
+                self.grade = 'F'
                 
         super().save(*args, **kwargs)

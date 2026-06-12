@@ -80,7 +80,7 @@
                                         {{ payment.student.user.get_full_name }}
                                     </a>
                                 </td>
-                                <td>{{ payment.fee_structure.course.course_name }}</td>
+                                <td>{{ payment.fee_structure.course.name }}</td>
                                 <td>{{ payment.fee_structure.category.name }}</td>
                                 <td>${{ payment.amount|floatformat:2 }}</td>
                                 <td>{{ payment.payment_date|date:"M d, Y" }}</td>

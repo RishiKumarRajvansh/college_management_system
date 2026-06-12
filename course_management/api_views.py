@@ -11,7 +11,8 @@ def course_credit_distribution(request):
     """API endpoint to return course distribution by credit value"""
     # Group courses by credit value and count them
     credit_distribution = Course.objects.values('credits').annotate(
-        count=Count('id')
+        # Course uses course_id as its explicit primary key.
+        count=Count('course_id')
     ).order_by('credits')
     
     # Create data structure for chart.js

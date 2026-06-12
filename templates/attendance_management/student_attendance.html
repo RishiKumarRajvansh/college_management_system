@@ -125,7 +125,7 @@
                         {% for attendance in page_obj %}
                         <tr>
                             <td>{{ attendance.date|date:"Y-m-d" }}</td>
-                            <td>{{ attendance.course.course_name }}</td>
+                            <td>{{ attendance.course.name }}</td>
                             <td>
                                 {% if attendance.status == 'present' %}
                                 <span class="badge bg-success">Present</span>

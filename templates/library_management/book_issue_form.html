@@ -55,46 +55,16 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.issue_date.id_for_label }}" class="form-label">Issue Date</label>
-                                    {{ form.issue_date }}
-                                    {% if form.issue_date.errors %}
+                                    <label for="{{ form.return_date.id_for_label }}" class="form-label">Return By</label>
+                                    {{ form.return_date }}
+                                    {% if form.return_date.errors %}
                                     <div class="invalid-feedback d-block">
-                                        {% for error in form.issue_date.errors %}
+                                        {% for error in form.return_date.errors %}
                                         {{ error }}
                                         {% endfor %}
                                     </div>
                                     {% endif %}
                                     <small class="form-text text-muted">Format: YYYY-MM-DD</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>
-                                    {{ form.due_date }}
-                                    {% if form.due_date.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in form.due_date.errors %}
-                                        {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    <small class="form-text text-muted">Format: YYYY-MM-DD</small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
-                                    {{ form.remarks }}
-                                    {% if form.remarks.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in form.remarks.errors %}
-                                        {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>

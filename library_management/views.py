@@ -6,7 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.db.models import Q, Count, Sum
 from .models import Book, BookIssue
-from .forms import BookForm, BookIssueForm
+from .forms import BookForm, BookIssueForm, BookReturnForm
 from datetime import date
 from decimal import Decimal
 
@@ -26,6 +26,7 @@ class LibraryDashboardView(LoginRequiredMixin, ListView):
         context['available_books'] = Book.objects.filter(availability=True).count()
         context['issued_books'] = Book.objects.filter(availability=False).count()
         context['recent_issues'] = BookIssue.objects.filter(is_returned=False).order_by('-issue_date')[:5]
+        context['categories_count'] = Book.objects.values('publication').distinct().count()
         return context
 
 
@@ -124,12 +125,21 @@ class BookIssueListView(LoginRequiredMixin, ListView):
         # Apply search filter if provided
         search_query = self.request.GET.get('search')
         if search_query:
-            queryset = queryset.filter(
+            search_filter = (
                 Q(book__title__icontains=search_query) |
                 Q(student__user__first_name__icontains=search_query) |
                 Q(student__user__last_name__icontains=search_query) |
-                Q(student__registration_number__icontains=search_query)
+                Q(student__name__icontains=search_query) |
+                Q(student__email__icontains=search_query)
             )
+            if search_query.upper().startswith('ST'):
+                numeric_part = search_query[2:].lstrip('0')
+                if numeric_part.isdigit():
+                    search_filter |= Q(student__student_id=int(numeric_part))
+            elif search_query.isdigit():
+                search_filter |= Q(student__student_id=int(search_query))
+
+            queryset = queryset.filter(search_filter)
             
         # Apply status filter if provided
         status = self.request.GET.get('status')
@@ -141,6 +151,11 @@ class BookIssueListView(LoginRequiredMixin, ListView):
             
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['today'] = date.today()
+        return context
+
 
 class BookIssueCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     """View for creating a new book issue"""
@@ -149,6 +164,18 @@ class BookIssueCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'library_management/book_issue_form.html'
     success_url = reverse_lazy('book_issue_list')
     success_message = "Book issued successfully"
+
+    def get_initial(self):
+        initial = super().get_initial()
+        book_id = self.request.GET.get('book_id')
+        if book_id:
+            initial['book'] = book_id
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Issue Book'
+        return context
     
     def form_valid(self, form):
         # Update book availability to False (not available)
@@ -174,6 +201,11 @@ class BookIssueUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     context_object_name = 'issue'
     pk_url_kwarg = 'issue_id'
     success_message = "Book issue was updated successfully"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Update Book Issue'
+        return context
     
     def get_success_url(self):
         return reverse('book_issue_detail', kwargs={'issue_id': self.object.issue_id})
@@ -183,10 +215,15 @@ class BookReturnView(LoginRequiredMixin, UpdateView):
     """View for returning a book"""
     model = BookIssue
     template_name = 'library_management/book_return_form.html'
-    fields = ['actual_return_date', 'fine_amount']
+    form_class = BookReturnForm
     context_object_name = 'issue'
     pk_url_kwarg = 'issue_id'
     success_url = reverse_lazy('book_issue_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Return Book'
+        return context
     
     def get_initial(self):
         # Set default values for the form

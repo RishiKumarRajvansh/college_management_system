@@ -10,7 +10,7 @@ class FeeCategoryAdmin(admin.ModelAdmin):
 class FeeStructureAdmin(admin.ModelAdmin):
     list_display = ('fee_structure_id', 'category', 'course', 'amount', 'academic_year', 'due_date')
     list_filter = ('category', 'academic_year', 'course')
-    search_fields = ('category__name', 'course__course_name')
+    search_fields = ('category__name', 'course__name', 'course__code')
     date_hierarchy = 'due_date'
 
 @admin.register(Payment)

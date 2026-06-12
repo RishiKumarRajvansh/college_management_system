@@ -46,7 +46,7 @@
                             </tr>
                             <tr>
                                 <th>Registration Number</th>
-                                <td>{{ payment.student.registration_number }}</td>
+                                <td>{{ payment.student.formatted_id }}</td>
                             </tr>
                             <tr>
                                 <th>Fee Category</th>
@@ -54,7 +54,7 @@
                             </tr>
                             <tr>
                                 <th>Course</th>
-                                <td>{{ payment.fee_structure.course.course_name }}</td>
+                                <td>{{ payment.fee_structure.course.name }}</td>
                             </tr>
                             <tr>
                                 <th>Academic Year</th>
@@ -74,7 +74,8 @@
                             </tr>
                             <tr>
                                 <th>Payment Date</th>
-                                <td>{{ payment.payment_date|date:"F d, Y H:i:s" }}</td>
+                                {# payment_date is a DateField; time formatting only belongs on DateTimeField values. #}
+                                <td>{{ payment.payment_date|date:"F d, Y" }}</td>
                             </tr>
                             <tr>
                                 <th>Status</th>
@@ -137,7 +138,7 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold">Registration No:</div>
-                            <div class="col-7">{{ payment.student.registration_number }}</div>
+                            <div class="col-7">{{ payment.student.formatted_id }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold">Fee Category:</div>
@@ -145,7 +146,7 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold">Course:</div>
-                            <div class="col-7">{{ payment.fee_structure.course.course_name }}</div>
+                            <div class="col-7">{{ payment.fee_structure.course.name }}</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-5 fw-bold">Academic Year:</div>

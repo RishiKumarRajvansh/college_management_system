@@ -17,7 +17,7 @@ class BookForm(forms.ModelForm):
 
 class BookIssueForm(forms.ModelForm):
     return_date = forms.DateField(
-        initial=datetime.now().date() + timedelta(days=14),
+        initial=lambda: datetime.now().date() + timedelta(days=14),
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
     
@@ -31,8 +31,11 @@ class BookIssueForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(BookIssueForm, self).__init__(*args, **kwargs)
-        # Only show available books in the dropdown
-        self.fields['book'].queryset = Book.objects.filter(availability=True)
+        # Only show available books, plus the currently selected book while editing.
+        queryset = Book.objects.filter(availability=True)
+        if self.instance and self.instance.pk:
+            queryset = queryset | Book.objects.filter(pk=self.instance.book.pk)
+        self.fields['book'].queryset = queryset.distinct()
 
 class BookReturnForm(forms.ModelForm):
     actual_return_date = forms.DateField(

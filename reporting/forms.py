@@ -5,6 +5,8 @@ from faculty_management.models import Faculty
 from course_management.models import Course
 from library_management.models import Book, BookIssue
 from hostel_management.models import Hostel, Room, HostelAllocation
+from fee_management.models import FeeCategory, Payment
+from examination.models import Examination, Result
 
 class ReportForm(forms.ModelForm):
     class Meta:
@@ -20,8 +22,12 @@ class ReportForm(forms.ModelForm):
         }
 
 class StudentReportForm(forms.Form):
-    title = forms.CharField(
+    report_title = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    report_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
     course = forms.ModelChoiceField(
         queryset=Course.objects.all(),
@@ -34,13 +40,14 @@ class StudentReportForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-    format = forms.ChoiceField(
-        choices=[('pdf', 'PDF'), ('excel', 'Excel')],
+    export_format = forms.ChoiceField(
+        choices=[('pdf', 'PDF'), ('excel', 'Excel'), ('csv', 'CSV')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
 class FacultyReportForm(forms.Form):
     title = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     department = forms.CharField(
@@ -51,9 +58,19 @@ class FacultyReportForm(forms.Form):
         choices=[('pdf', 'PDF'), ('excel', 'Excel')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+    experience = forms.IntegerField(
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 0})
+    )
+    report_type = forms.ChoiceField(
+        choices=[('summary', 'Summary'), ('detailed', 'Detailed')],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 class AttendanceReportForm(forms.Form):
     title = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     course = forms.ModelChoiceField(
@@ -78,9 +95,15 @@ class AttendanceReportForm(forms.Form):
         choices=[('pdf', 'PDF'), ('excel', 'Excel')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+    report_type = forms.ChoiceField(
+        choices=[('summary', 'Summary'), ('detailed', 'Detailed')],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 class ExaminationReportForm(forms.Form):
     title = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     course = forms.ModelChoiceField(
@@ -106,9 +129,21 @@ class ExaminationReportForm(forms.Form):
         choices=[('pdf', 'PDF'), ('excel', 'Excel')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+    examination = forms.ModelChoiceField(
+        queryset=Examination.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="All Examinations"
+    )
+    status = forms.ChoiceField(
+        choices=[('', 'All Status')] + list(Result.STATUS_CHOICES),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 class FeeReportForm(forms.Form):
     title = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     status = forms.ChoiceField(
@@ -128,17 +163,52 @@ class FeeReportForm(forms.Form):
         choices=[('pdf', 'PDF'), ('excel', 'Excel')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="All Courses"
+    )
+    student = forms.ModelChoiceField(
+        queryset=Student.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="All Students"
+    )
+    category = forms.ModelChoiceField(
+        queryset=FeeCategory.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="All Categories"
+    )
+    payment_status = forms.ChoiceField(
+        choices=[('', 'All Status')] + list(Payment.PAYMENT_STATUS),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    report_type = forms.ChoiceField(
+        choices=[('summary', 'Summary'), ('detailed', 'Detailed')],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
 class ReportSearchForm(forms.Form):
-    search_query = forms.CharField(
+    title = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search by Report Title'})
     )
-    
     report_type = forms.ChoiceField(
         choices=[('', 'All Types')] + list(Report.REPORT_TYPES),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    start_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+    )
+    end_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
     is_scheduled = forms.ChoiceField(
         choices=[('', 'All Reports'), ('True', 'Scheduled Only'), ('False', 'One-time Only')],

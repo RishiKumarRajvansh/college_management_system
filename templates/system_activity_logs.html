@@ -1,181 +1,201 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}System Activity Logs | College Management System{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">System Activity Logs</h1>
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-primary shadow-sm">
-                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
+            <p class="text-sm font-medium text-slate-500">Security and operations</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">System Activity Logs</h1>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'admin_dashboard' %}" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+                <i class="fas fa-arrow-left"></i>
+                Dashboard
             </a>
-        </div>
-    </div>    <!-- Filters Card -->
-    <div class="card mb-4 shadow">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Activities</h6>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="{% url 'auth:system_activity_logs' %}" class="form-inline">
-                <div class="row w-100">
-                    <div class="col-md-3 mb-2">
-                        <label for="module" class="mr-2">Module:</label>
-                        <select name="module" id="module" class="form-control w-100">
-                            <option value="">All Modules</option>
-                            {% for module in available_modules %}
-                                <option value="{{ module }}" {% if selected_module == module %}selected{% endif %}>
-                                    {{ module|title }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>                    <div class="col-md-2 mb-2">
-                        <label for="action" class="mr-2">Action:</label>
-                        <select name="action" id="action" class="form-control w-100">
-                            <option value="">All Actions</option>
-                            {% for action_value, action_label in available_actions %}
-                                <option value="{{ action_value }}" {% if selected_action == action_value %}selected{% endif %}>
-                                    {{ action_label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>                <div class="col-md-2 mb-3">
-                    <label for="user_filter">User</label>
-                    <select name="user_filter" id="user_filter" class="form-control w-100">
-                        <option value="">All Users</option>
-                        {% for user_obj in available_users %}
-                            <option value="{{ user_obj.id }}" {% if selected_user|stringformat:"i" == user_obj.id|stringformat:"i" %}selected{% endif %}>{{ user_obj.username }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="date_from">From Date</label>
-                    <input type="date" name="date_from" id="date_from" class="form-control w-100" value="{{ date_from|date:'Y-m-d' }}">
-                </div>                <div class="col-md-2 mb-3">
-                    <label for="date_to">To Date</label>
-                    <input type="date" name="date_to" id="date_to" class="form-control w-100" value="{{ date_to|date:'Y-m-d' }}">
-                </div>                <div class="col-md-3 mb-3">
-                    <label for="search">Search Description</label>
-                    <input type="text" name="search" id="search" class="form-control w-100" value="{{ search_query }}" placeholder="Search in description...">
-                </div>
-                <div class="col-md-12 d-flex justify-content-between mt-2">
-                    <div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-filter"></i> Apply Filters
-                        </button>
-                        {% if request.GET %}
-                        <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-secondary ml-2">
-                            <i class="fas fa-times"></i> Clear Filters
-                        </a>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <button type="submit" name="export" value="csv" class="btn btn-success">
-                            <i class="fas fa-file-csv"></i> Export to CSV
-                        </button>
-                    </div>
-                </div>
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-filter"></i> Apply Filters
-                    </button>
-                    {% if request.GET %}
-                    <a href="{% url 'auth:system_activity_logs' %}" class="btn btn-secondary ml-2">
-                        <i class="fas fa-times"></i> Clear Filters
-                    </a>
-                    {% endif %}
-                </div>
-            </form>
+            <a href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}export=csv" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
+                <i class="fas fa-file-csv"></i>
+                Export CSV
+            </a>
         </div>
     </div>
 
-    <!-- Activity Logs Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="m-0 font-weight-bold text-primary">Activity Log Entries</h5>
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Visible Logs</p>
+            <p class="mt-2 text-3xl font-bold text-slate-950">{{ total_activity_count }}</p>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable">                    <thead class="bg-primary text-white">
-                        <tr>
-                            <th>Timestamp</th>
-                            <th>User</th>
-                            <th>Module</th>
-                            <th>Action</th>
-                            <th>Description</th>
-                            <th>IP Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for activity in activities %}
-                        <tr>
-                            <td>{{ activity.action_time }}</td>
-                            <td>{{ activity.user.username|default:"Anonymous" }}</td>
-                            <td>{{ activity.module|title }}</td>
-                            <td>
-                                <span class="badge {% if activity.action == 'create' %}bg-success{% elif activity.action == 'update' %}bg-primary{% elif activity.action == 'delete' %}bg-danger{% else %}bg-info{% endif %}">
-                                    {{ activity.get_action_display }}
-                                </span>
-                            </td>
-                            <td>{{ activity.description }}</td>
-                            <td>{{ activity.ip_address|default:"N/A" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center">No activity logs found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Filtered Results</p>
+            <p class="mt-2 text-3xl font-bold text-blue-700">{{ filtered_activity_count }}</p>
         </div>
-        <div class="card-footer">
-            {% if activities.has_other_pages %}
-            <nav>
-                <ul class="pagination justify-content-center mb-0">
-                    {% if activities.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ activities.previous_page_number }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&laquo;</span>
-                    </li>
-                    {% endif %}
-                    
-                    {% for num in activities.paginator.page_range %}
-                        {% if activities.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
-                        {% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
-                        <li class="page-item">
-                            <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ num }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">{{ num }}</a>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if activities.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{% url 'auth:system_activity_logs' %}?page={{ activities.next_page_number }}{% if request.GET.module %}&module={{ request.GET.module }}{% endif %}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}{% if request.GET.user_filter %}&user_filter={{ request.GET.user_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&raquo;</span>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Active Filters</p>
+            <p class="mt-2 text-3xl font-bold text-slate-950">{{ active_filter_count }}</p>
         </div>
     </div>
+
+    {% if date_error %}
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        {{ date_error }}
+    </div>
+    {% endif %}
+
+    <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-5 py-4">
+            <h2 class="text-lg font-semibold text-slate-950">Filters</h2>
+        </div>
+        <form method="get" action="{% url 'auth:system_activity_logs' %}" class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-6">
+            <div>
+                <label for="module" class="mb-1 block text-sm font-semibold text-slate-700">Module</label>
+                <select name="module" id="module" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All modules</option>
+                    {% for module in available_modules %}
+                    <option value="{{ module }}" {% if selected_module == module %}selected{% endif %}>{{ module|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="action" class="mb-1 block text-sm font-semibold text-slate-700">Action</label>
+                <select name="action" id="action" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All actions</option>
+                    {% for action_value, action_label in available_actions %}
+                    <option value="{{ action_value }}" {% if selected_action == action_value %}selected{% endif %}>{{ action_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="user_filter" class="mb-1 block text-sm font-semibold text-slate-700">User</label>
+                <select name="user_filter" id="user_filter" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All users</option>
+                    {% for user_obj in available_users %}
+                    <option value="{{ user_obj.id }}" {% if selected_user|stringformat:"i" == user_obj.id|stringformat:"i" %}selected{% endif %}>
+                        {{ user_obj.get_full_name|default:user_obj.username }}{% if user_obj.email %} ({{ user_obj.email }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="date_from" class="mb-1 block text-sm font-semibold text-slate-700">From</label>
+                <input type="date" name="date_from" id="date_from" value="{{ date_from }}" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            </div>
+
+            <div>
+                <label for="date_to" class="mb-1 block text-sm font-semibold text-slate-700">To</label>
+                <input type="date" name="date_to" id="date_to" value="{{ date_to }}" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            </div>
+
+            <div>
+                <label for="search" class="mb-1 block text-sm font-semibold text-slate-700">Search</label>
+                <input type="search" name="search" id="search" value="{{ search_query }}" placeholder="User, module, IP, description" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            </div>
+
+            <div class="flex flex-wrap items-end gap-3 md:col-span-2 xl:col-span-6">
+                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+                    <i class="fas fa-filter"></i>
+                    Apply Filters
+                </button>
+                {% if active_filter_count %}
+                <a href="{% url 'auth:system_activity_logs' %}" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+                    <i class="fas fa-times"></i>
+                    Clear
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-950">Activity Entries</h2>
+                <p class="text-sm text-slate-500">
+                    Showing {{ activities.start_index }}-{{ activities.end_index }} of {{ filtered_activity_count }} entries.
+                </p>
+            </div>
+            {% if latest_activity %}
+            <p class="text-sm text-slate-500">Latest: {{ latest_activity.action_time|date:"M d, Y H:i" }}</p>
+            {% endif %}
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <tr>
+                        <th class="px-5 py-3">Timestamp</th>
+                        <th class="px-5 py-3">User</th>
+                        <th class="px-5 py-3">Module</th>
+                        <th class="px-5 py-3">Action</th>
+                        <th class="px-5 py-3">Description</th>
+                        <th class="px-5 py-3">IP Address</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    {% for activity in activities %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="whitespace-nowrap px-5 py-4 text-slate-700">{{ activity.action_time|date:"M d, Y H:i:s" }}</td>
+                        <td class="px-5 py-4">
+                            <div class="font-semibold text-slate-950">{{ activity.user.get_full_name|default:activity.user.username|default:"Anonymous" }}</div>
+                            {% if activity.user.email %}
+                            <div class="text-xs text-slate-500">{{ activity.user.email }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap px-5 py-4 text-slate-700">{{ activity.module|title }}</td>
+                        <td class="whitespace-nowrap px-5 py-4">
+                            {% if activity.action == 'create' %}
+                            <span class="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">{{ activity.get_action_display }}</span>
+                            {% elif activity.action == 'update' %}
+                            <span class="inline-flex rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-700">{{ activity.get_action_display }}</span>
+                            {% elif activity.action == 'delete' %}
+                            <span class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700">{{ activity.get_action_display }}</span>
+                            {% elif activity.action == 'login' %}
+                            <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700">{{ activity.get_action_display }}</span>
+                            {% elif activity.action == 'logout' %}
+                            <span class="inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-xs font-bold text-slate-700">{{ activity.get_action_display }}</span>
+                            {% else %}
+                            <span class="inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">{{ activity.get_action_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="min-w-72 px-5 py-4 text-slate-700">{{ activity.description }}</td>
+                        <td class="whitespace-nowrap px-5 py-4 text-slate-500">{{ activity.ip_address|default:"N/A" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-5 py-12 text-center text-sm text-slate-500">
+                            No activity logs match the selected filters.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if activities.has_other_pages %}
+        <div class="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-slate-500">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</p>
+            <nav class="flex flex-wrap gap-2">
+                {% if activities.has_previous %}
+                <a href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ activities.previous_page_number }}" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Previous</a>
+                {% endif %}
+
+                {% for num in activities.paginator.page_range %}
+                    {% if activities.number == num %}
+                    <span class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white">{{ num }}</span>
+                    {% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
+                    <a href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ num }}" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if activities.has_next %}
+                <a href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ activities.next_page_number }}" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Next</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

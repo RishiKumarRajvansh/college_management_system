@@ -9,7 +9,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Course Management Dashboard</h1>
         {% if user.is_superuser or user.profile.user_type == 'admin' or user.profile.user_type == 'faculty' %}
-        <a href="{% url 'course_add' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <a href="{% url 'course_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-plus fa-sm text-white-50"></i> Add New Course
         </a>
         {% endif %}
@@ -155,14 +155,14 @@
                                     <td>{{ course.credits }}</td>
                                     <td>{{ course.faculty.name|default:"Not Assigned" }}</td>
                                     <td>
-                                        <a href="{% url 'course_detail' course.id %}" class="btn btn-info btn-sm">
+                                        <a href="{% url 'course_detail' course.course_id %}" class="btn btn-info btn-sm">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         {% if user.is_superuser or user.profile.user_type == 'admin' %}
-                                        <a href="{% url 'course_edit' course.id %}" class="btn btn-primary btn-sm">
+                                        <a href="{% url 'course_update' course.course_id %}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'course_delete' course.id %}" class="btn btn-danger btn-sm">
+                                        <a href="{% url 'course_delete' course.course_id %}" class="btn btn-danger btn-sm">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                         {% endif %}
@@ -191,7 +191,7 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        <a href="{% url 'course_add' %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'course_create' %}" class="list-group-item list-group-item-action">
                             <i class="fas fa-plus-circle mr-2"></i> Add New Course
                         </a>
                         <a href="{% url 'course_list' %}?search_query=active" class="list-group-item list-group-item-action">
@@ -235,7 +235,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Load course credit distribution chart
-        fetch('/api/course-credit-distribution/')
+        fetch("{% url 'api_course_credit_distribution' %}")
             .then(response => response.json())
             .then(data => {
                 const ctx = document.getElementById('courseCreditCanvas').getContext('2d');
@@ -279,7 +279,7 @@
             });
 
         // Load course enrollment chart
-        fetch('/api/course-enrollment/')
+        fetch("{% url 'api_course_enrollment' %}")
             .then(response => response.json())
             .then(data => {
                 const ctx = document.getElementById('courseEnrollmentCanvas').getContext('2d');

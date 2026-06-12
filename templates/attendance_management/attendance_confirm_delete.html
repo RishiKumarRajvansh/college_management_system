@@ -27,7 +27,7 @@
                 <h6><i class="fas fa-info-circle"></i> Record Details:</h6>
                 <ul class="mb-0">
                     <li><strong>Student:</strong> {{ attendance.student.name }}</li>
-                    <li><strong>Course:</strong> {{ attendance.course.course_name }}</li>
+                    <li><strong>Course:</strong> {{ attendance.course.name }}</li>
                     <li><strong>Date:</strong> {{ attendance.date|date:"F d, Y" }}</li>
                     <li><strong>Status:</strong> {{ attendance.get_status_display }}</li>
                 </ul>

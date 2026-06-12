@@ -15,13 +15,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-
-import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend for server environments
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
+from openpyxl import Workbook
 
 from .models import Report, Notification
 from .forms import (
@@ -151,10 +145,11 @@ def student_report(request):
         form = StudentReportForm(request.POST)
         if form.is_valid():
             # Extract form data
-            title = form.cleaned_data['title']
+            title = form.cleaned_data['report_title']
+            description = form.cleaned_data.get('report_description')
             course = form.cleaned_data.get('course')
             year = form.cleaned_data.get('year')
-            report_format = form.cleaned_data.get('format')
+            report_format = form.cleaned_data.get('export_format')
             
             # Query the students based on filters
             students = Student.objects.all()
@@ -175,7 +170,7 @@ def student_report(request):
             # Create a new report record
             report = Report.objects.create(
                 title=title,
-                description=f"Student report for {course.course_name if course else 'all courses'}, Year: {year if year and year != '0' else 'All'}",
+                description=description or f"Student report for {course.name if course else 'all courses'}, Year: {year if year and year != '0' else 'All'}",
                 report_type='student',
                 generated_by=request.user,
                 parameters=parameters
@@ -193,7 +188,7 @@ def student_report(request):
                 # Add report info
                 p.setFont("Helvetica", 12)
                 p.drawString(100, 730, f"Generated on: {timezone.now().strftime('%B %d, %Y')}")
-                p.drawString(100, 710, f"Course: {course.course_name if course else 'All Courses'}")
+                p.drawString(100, 710, f"Course: {course.name if course else 'All Courses'}")
                 p.drawString(100, 690, f"Year: {year if year and year != '0' else 'All'}")
                 p.drawString(100, 670, f"Total Students: {students.count()}")
                 
@@ -220,7 +215,7 @@ def student_report(request):
                     p.drawString(100, y, str(student.student_id))
                     p.drawString(180, y, student.name)
                     p.drawString(350, y, student.email)
-                    p.drawString(450, y, student.course.course_name)
+                    p.drawString(450, y, student.course.name)
                     p.drawString(500, y, str(student.year))
                     
                     y -= 20
@@ -242,23 +237,22 @@ def student_report(request):
                 return FileResponse(buffer, as_attachment=True, filename=f'student_report_{timezone.now().strftime("%Y%m%d")}.pdf')
             
             elif report_format == 'excel':
-                # Create a DataFrame for Excel export
-                data = []
+                workbook = Workbook()
+                worksheet = workbook.active
+                worksheet.title = 'Students'
+                worksheet.append(['Student ID', 'Name', 'Email', 'Course', 'Year', 'Created On'])
                 for student in students:
-                    data.append({
-                        'Student ID': student.student_id,
-                        'Name': student.name,
-                        'Email': student.email,
-                        'Course': student.course.course_name,
-                        'Year': student.year,
-                        'Created On': student.created_at
-                    })
-                
-                df = pd.DataFrame(data)
-                
-                # Export to Excel
+                    worksheet.append([
+                        student.formatted_id,
+                        student.name,
+                        student.email,
+                        student.course.name,
+                        student.year,
+                        student.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    ])
+
                 file_path = f"student_report_{report.report_id}.xlsx"
-                df.to_excel(file_path, index=False)
+                workbook.save(file_path)
                 
                 # Update the report with the file path
                 report.file_path = file_path
@@ -269,11 +263,19 @@ def student_report(request):
                     response = HttpResponse(f.read(), content_type='application/vnd.ms-excel')
                     response['Content-Disposition'] = f'attachment; filename="student_report_{timezone.now().strftime("%Y%m%d")}.xlsx"'
                     return response
+            elif report_format == 'csv':
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = f'attachment; filename="student_report_{timezone.now().strftime("%Y%m%d")}.csv"'
+                writer = csv.writer(response)
+                writer.writerow(['Student ID', 'Name', 'Email', 'Course', 'Year'])
+                for student in students:
+                    writer.writerow([student.formatted_id, student.name, student.email, student.course.name, student.year])
+                return response
             
             # Redirect to the report detail page
             return redirect('report_detail', report_id=report.report_id)
     else:
-        form = StudentReportForm()
+        form = StudentReportForm(initial={'report_title': f'Student Report - {timezone.now().strftime("%B %Y")}'})
     
     return render(request, 'reporting/student_report_form.html', {'form': form})
 
@@ -284,9 +286,11 @@ def faculty_report(request):
         form = FacultyReportForm(request.POST)
         if form.is_valid():
             # Extract data and generate faculty report
-            title = form.cleaned_data['title']
+            title = form.cleaned_data.get('title') or f'Faculty Report - {timezone.now().strftime("%B %Y")}'
             department = form.cleaned_data.get('department')
             report_format = form.cleaned_data.get('format')
+            experience = form.cleaned_data.get('experience')
+            report_type = form.cleaned_data.get('report_type')
             
             # Query faculty based on filters
             faculty = Faculty.objects.all()
@@ -297,6 +301,8 @@ def faculty_report(request):
             # Create report object
             parameters = {
                 'department': department,
+                'experience': experience,
+                'report_type': report_type,
                 'format': report_format
             }
             
@@ -324,19 +330,26 @@ def fee_report(request):
         form = FeeReportForm(request.POST)
         if form.is_valid():
             # Extract data and generate fee report
-            title = form.cleaned_data['report_title']
-            description = form.cleaned_data.get('report_description')
-            fee_category = form.cleaned_data.get('fee_category')
+            title = form.cleaned_data.get('title') or f'Fee Report - {timezone.now().strftime("%B %Y")}'
+            course = form.cleaned_data.get('course')
+            student = form.cleaned_data.get('student')
+            fee_category = form.cleaned_data.get('category')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
             payment_status = form.cleaned_data.get('payment_status')
-            report_format = form.cleaned_data.get('export_format')
+            report_format = form.cleaned_data.get('format')
             
             # Query fee payments based on filters
             payments = FeePayment.objects.all()
-            
+
+            if course:
+                payments = payments.filter(fee_structure__course=course)
+
+            if student:
+                payments = payments.filter(student=student)
+
             if fee_category:
-                payments = payments.filter(fee_structure__fee_category__category_name=fee_category)
+                payments = payments.filter(fee_structure__category=fee_category)
             
             if start_date:
                 payments = payments.filter(payment_date__gte=start_date)
@@ -349,7 +362,9 @@ def fee_report(request):
             
             # Create report object
             parameters = {
-                'fee_category': fee_category,
+                'course': course.course_id if course else None,
+                'student': student.student_id if student else None,
+                'fee_category': fee_category.fee_category_id if fee_category else None,
                 'start_date': start_date.strftime('%Y-%m-%d') if start_date else None,
                 'end_date': end_date.strftime('%Y-%m-%d') if end_date else None,
                 'payment_status': payment_status,
@@ -358,7 +373,7 @@ def fee_report(request):
             
             report = Report.objects.create(
                 title=title,
-                description=description or f"Fee report from {start_date} to {end_date}",
+                description=f"Fee report from {start_date or 'beginning'} to {end_date or 'present'}",
                 report_type='fee',
                 generated_by=request.user,
                 parameters=parameters
@@ -369,7 +384,7 @@ def fee_report(request):
             return redirect('report_detail', report_id=report.report_id)
     else:
         form = FeeReportForm(initial={
-            'report_title': f'Fee Report - {timezone.now().strftime("%B %Y")}',
+            'title': f'Fee Report - {timezone.now().strftime("%B %Y")}',
             'start_date': (timezone.now() - timedelta(days=30)).date(),
             'end_date': timezone.now().date()
         })
@@ -382,11 +397,23 @@ def library_report(request):
     if request.method == 'POST':
         form = LibraryReportForm(request.POST)
         if form.is_valid():
-            # Implementation similar to other reports
-            return redirect('reporting_dashboard')
+            report = Report.objects.create(
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data.get('description'),
+                report_type='library',
+                generated_by=request.user,
+                parameters={
+                    'book_status': form.cleaned_data.get('book_status'),
+                    'date_range': form.cleaned_data.get('date_range'),
+                    'start_date': form.cleaned_data.get('start_date').isoformat() if form.cleaned_data.get('start_date') else None,
+                    'end_date': form.cleaned_data.get('end_date').isoformat() if form.cleaned_data.get('end_date') else None,
+                    'format': form.cleaned_data.get('format'),
+                }
+            )
+            return redirect('report_detail', report_id=report.report_id)
     else:
         form = LibraryReportForm(initial={
-            'report_title': f'Library Report - {timezone.now().strftime("%B %Y")}',
+            'title': f'Library Report - {timezone.now().strftime("%B %Y")}',
             'start_date': (timezone.now() - timedelta(days=30)).date(),
             'end_date': timezone.now().date()
         })
@@ -399,11 +426,25 @@ def hostel_report(request):
     if request.method == 'POST':
         form = HostelReportForm(request.POST)
         if form.is_valid():
-            # Implementation similar to other reports
-            return redirect('reporting_dashboard')
+            report = Report.objects.create(
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data.get('description'),
+                report_type='hostel',
+                generated_by=request.user,
+                parameters={
+                    'hostel': form.cleaned_data.get('hostel').hostel_id if form.cleaned_data.get('hostel') else None,
+                    'room_status': form.cleaned_data.get('room_status'),
+                    'allocation_status': form.cleaned_data.get('allocation_status'),
+                    'date_range': form.cleaned_data.get('date_range'),
+                    'start_date': form.cleaned_data.get('start_date').isoformat() if form.cleaned_data.get('start_date') else None,
+                    'end_date': form.cleaned_data.get('end_date').isoformat() if form.cleaned_data.get('end_date') else None,
+                    'format': form.cleaned_data.get('format'),
+                }
+            )
+            return redirect('report_detail', report_id=report.report_id)
     else:
         form = HostelReportForm(initial={
-            'report_title': f'Hostel Report - {timezone.now().strftime("%B %Y")}',
+            'title': f'Hostel Report - {timezone.now().strftime("%B %Y")}',
         })
     
     return render(request, 'reporting/hostel_report_form.html', {'form': form})
@@ -414,11 +455,26 @@ def attendance_report(request):
     if request.method == 'POST':
         form = AttendanceReportForm(request.POST)
         if form.is_valid():
-            # Implementation similar to other reports
-            return redirect('reporting_dashboard')
+            course = form.cleaned_data.get('course')
+            student = form.cleaned_data.get('student')
+            report = Report.objects.create(
+                title=form.cleaned_data.get('title') or f'Attendance Report - {timezone.now().strftime("%B %Y")}',
+                description='Attendance report',
+                report_type='attendance',
+                generated_by=request.user,
+                parameters={
+                    'course': course.course_id if course else None,
+                    'student': student.student_id if student else None,
+                    'start_date': form.cleaned_data.get('start_date').isoformat(),
+                    'end_date': form.cleaned_data.get('end_date').isoformat(),
+                    'report_type': form.cleaned_data.get('report_type'),
+                    'format': form.cleaned_data.get('format'),
+                }
+            )
+            return redirect('report_detail', report_id=report.report_id)
     else:
         form = AttendanceReportForm(initial={
-            'report_title': f'Attendance Report - {timezone.now().strftime("%B %Y")}',
+            'title': f'Attendance Report - {timezone.now().strftime("%B %Y")}',
             'start_date': (timezone.now() - timedelta(days=30)).date(),
             'end_date': timezone.now().date()
         })
@@ -431,11 +487,27 @@ def examination_report(request):
     if request.method == 'POST':
         form = ExaminationReportForm(request.POST)
         if form.is_valid():
-            # Implementation similar to other reports
-            return redirect('reporting_dashboard')
+            course = form.cleaned_data.get('course')
+            examination = form.cleaned_data.get('examination')
+            report = Report.objects.create(
+                title=form.cleaned_data.get('title') or f'Examination Report - {timezone.now().strftime("%B %Y")}',
+                description='Examination report',
+                report_type='examination',
+                generated_by=request.user,
+                parameters={
+                    'course': course.course_id if course else None,
+                    'examination': examination.exam_id if examination else None,
+                    'exam_type': form.cleaned_data.get('exam_type'),
+                    'status': form.cleaned_data.get('status'),
+                    'start_date': form.cleaned_data.get('start_date').isoformat() if form.cleaned_data.get('start_date') else None,
+                    'end_date': form.cleaned_data.get('end_date').isoformat() if form.cleaned_data.get('end_date') else None,
+                    'format': form.cleaned_data.get('format'),
+                }
+            )
+            return redirect('report_detail', report_id=report.report_id)
     else:
         form = ExaminationReportForm(initial={
-            'report_title': f'Examination Report - {timezone.now().strftime("%B %Y")}'
+            'title': f'Examination Report - {timezone.now().strftime("%B %Y")}'
         })
     
     return render(request, 'reporting/examination_report_form.html', {'form': form})

@@ -65,7 +65,8 @@ def course_list(request):
         
         if search_query:
             courses = courses.filter(
-                Q(course_name__icontains=search_query) | 
+                Q(name__icontains=search_query) | 
+                Q(code__icontains=search_query) |
                 Q(course_id__icontains=search_query)
             )
         
@@ -98,7 +99,7 @@ def course_create(request):
         form = CourseForm(request.POST)
         if form.is_valid():
             course = form.save()
-            messages.success(request, f'Course {course.course_name} created successfully!')
+            messages.success(request, f'Course {course.name} created successfully!')
             return redirect('course_detail', pk=course.course_id)
     else:
         form = CourseForm()
@@ -130,7 +131,7 @@ def course_update(request, pk):
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
             course = form.save()
-            messages.success(request, f'Course {course.course_name} updated successfully!')
+            messages.success(request, f'Course {course.name} updated successfully!')
             return redirect('course_detail', pk=course.course_id)
     else:
         form = CourseForm(instance=course)
@@ -144,7 +145,7 @@ def course_delete(request, pk):
     course = get_object_or_404(Course, course_id=pk)
     
     if request.method == 'POST':
-        course_name = course.course_name
+        course_name = course.name
         course.delete()
         messages.success(request, f'Course {course_name} deleted successfully!')
         return redirect('course_list')

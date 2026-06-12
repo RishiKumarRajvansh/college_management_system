@@ -119,7 +119,7 @@ class FeeStructureListView(LoginRequiredMixin, ListView):
         if search_query:
             queryset = queryset.filter(
                 Q(category__name__icontains=search_query) |
-                Q(course__course_name__icontains=search_query)
+                Q(course__name__icontains=search_query)
             )
             
         # Apply academic year filter if provided

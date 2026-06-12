@@ -5,7 +5,7 @@ from .models import Examination, Result
 class ExaminationAdmin(admin.ModelAdmin):
     list_display = ('exam_id', 'exam_name', 'course', 'exam_type', 'date', 'total_marks', 'passing_marks')
     list_filter = ('exam_type', 'course')
-    search_fields = ('exam_name', 'course__course_name')
+    search_fields = ('exam_name', 'course__name', 'course__code')
     date_hierarchy = 'date'
 
 @admin.register(Result)
